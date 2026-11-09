@@ -1,0 +1,3 @@
+Here we show that \fast{0} across iterative refinement(Section~\ref{sec:iterative-refinement}) configurations at a turn budget of $N=10$ compared to one-shot baseline (Section~\ref{4.1}). We find that models self-correct more effectively with execution feedback $E$, fixing issues especially related to execution errors. Notably, DeepSeek-R1 on Level 1 and 2 can generate a functional kernel on \textgreater 90\% of the tasks given $10$ turns of iterative refinement. However, the remaining incorrect kernels almost always fail due to functional incorrectness, likely because correctness feedback is less granular than execution failure messages.
+
+\input{tables/fast_0_comparison}

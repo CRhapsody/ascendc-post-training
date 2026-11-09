@@ -1,0 +1,60 @@
+% \begin{table}[h]
+% \centering
+% \begin{tabular}{|l|c|c|c|}
+% \hline
+% \multicolumn{4}{|c|}{\rule{0pt}{12pt}\textbf{With Specs of NVIDIA A100}} \\ \hline
+% \textbf{Models} & \textbf{fast\_1} & \textbf{fast\_0} & \textbf{Speedup} \\ \hline
+% Llama 3.1 70B       & +2               & +4               & N/A               \\ 
+% Deepseek V3     & -3               & -4               & 1                \\ 
+% OpenAI o1       & +7               & +10              & 1                \\ 
+% Deepseek R1     & -7               & -20              & 1.07             \\ \hline
+% \multicolumn{4}{|c|}{\rule{0pt}{12pt}\textbf{With Specs of NVIDIA H100}} \\ \hline
+% \textbf{Models} & \textbf{fast\_1} & \textbf{fast\_0} & \textbf{Speedup} \\ \hline
+% Llama 3.1 70B       & +2               & +3               & N/A               \\ 
+% Deepseek V3     & -2               & -3               & 1                \\ 
+% OpenAI o1       & 0                & +2               & 1.01             \\ 
+% Deepseek R1     & -12              & -14              & 1.06             \\ \hline
+% \end{tabular}
+% \caption{\textbf{Effect of Providing Hardware Information on NVIDIA A100 and H100}. Differences in fast\_1, fast\_0, and speedup on KernelBench Level 2 for NVIDIA A100 and H100 when models are provided hardware information in-context. \todo{DOUBLE CHECK THESE SPEEDUP, analyze o1 runs}}
+% \label{tab:hw-prompt}
+% \end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\multicolumn{4}{|c|}{\rule{0pt}{12pt}\textbf{With Specs of NVIDIA A100}} \\ \hline
+\textbf{Models} & \makecell{\textbf{Correct}\\\textbf{(fast\textsubscript{0})}} & \makecell{\textbf{Faster}\\\textbf{(fast\textsubscript{1})}} & \textbf{Speedup} \\ \hline
+Llama 3.1 70B       & \textcolor{green}{+4}       & \textcolor{green}{+2}       & N/A               \\ 
+DeepSeek V3         & \textcolor{red}{-4}         & \textcolor{red}{-3}         & 1                \\ 
+OpenAI o1           & \textcolor{green}{+10}      & \textcolor{green}{+7}       & 1                \\ 
+DeepSeek R1         & \textcolor{red}{-20}        & \textcolor{red}{-7}         & 1.07             \\ \hline
+\multicolumn{4}{|c|}{\rule{0pt}{12pt}\textbf{With Specs of NVIDIA H100}} \\ \hline
+\textbf{Models} & \makecell{\textbf{Correct}\\\textbf{(fast\textsubscript{0})}} & \makecell{\textbf{Faster}\\\textbf{(fast\textsubscript{1})}} & \textbf{Speedup} \\ \hline
+Llama 3.1 70B       & \textcolor{green}{+3}       & \textcolor{green}{+2}       & N/A               \\ 
+DeepSeek V3         & \textcolor{red}{-3}         & \textcolor{red}{-2}         & 1                \\ 
+OpenAI o1           & \textcolor{green}{+2}       & \textcolor{green}{0}        & 1.01             \\ 
+DeepSeek R1         & \textcolor{red}{-14}        & \textcolor{red}{-7}        & 1.06             \\ \hline
+\end{tabular}
+\caption{\textbf{Effect of Providing Hardware Information on NVIDIA A100 and H100}. Differences in Correct (fast\textsubscript{0}), Correct and Faster (fast\textsubscript{1}), and speedup on KernelBench Level 2 for NVIDIA A100 and H100 when models are provided hardware information in-context.}
+\label{tab:hw-prompt}
+\end{table}
+
+
+
+
+% old table - with inst stats
+% \begin{table}[h]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|}
+% \hline
+% \textbf{GPU} & \multicolumn{2}{c|}{\textbf{A100}} & \multicolumn{2}{c|}{\textbf{H100}} \\ \hline
+% \textbf{Diff}       & \textbf{fast\_1} & \textbf{\# Inst} & \textbf{fast\_1} & \textbf{\#Inst} \\ \hline
+% Llama 70B             & \textbf{+2}& -3& \textbf{TBD}& TBD                 \\ \hline
+% Deepseek V3           & \textbf{-3}            & +24& \textbf{-2}& +23\\ \hline
+% OpenAI o1             & \textbf{TBD}            & TBD& \textbf{TBD}            & -50                 \\ \hline
+% Deepseek R1           & \textbf{-7}& +39& \textbf{-12}& +59\\ \hline
+% \end{tabular}
+% \caption{The effect of including hardware specifications in single-shot generation on the overall fast\_1 metric and the average number of hardware-specific instruction on Level 2. We show the difference between no hardware info and with hardware info. Evaluated for NVIDIA A100 and H100 platforms.}
+% \label{tab:hw-prompt}
+% \end{table}

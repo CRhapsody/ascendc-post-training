@@ -1,0 +1,35 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{llccc}
+\toprule
+\textbf{Level} & \textbf{GPUs} & \textbf{Llama-3.1-70b-Inst} & \textbf{DeepSeek-V3} & \textbf{DeepSeek-R1} \\
+\midrule
+\multirow{6}{*}{
+\textbf{1}}
+ & \textbf{L40S} & 3\% & 6\% & 12\% \\
+ & \textbf{H100} & 2\% & 7\% & 16\% \\
+ & \textbf{A100} & 3\% & 7\% & 16\%\\
+ & \textbf{L4} & 2\% & 4\% & 15\% \\
+ & \textbf{T4} & 3\% & 7\% & 22\% \\
+ & \textbf{A10G} & 2\% & 7\% & 12\% \\
+\midrule
+\multirow{6}{*}{\textbf{2}}
+ & \textbf{L40S} & 0\% & 4\% & 36\% \\
+ & \textbf{H100} & 0\% & 4\% & 42\%\\
+ & \textbf{A100} & 0\% & 4\% & 38\%\\
+ & \textbf{L4} & 0\% & 4\% & 36\% \\
+ & \textbf{T4} & 0\% & 4\% & 46\% \\
+ & \textbf{A10G} & 0\% & 4\% & 47\% \\
+\midrule
+\multirow{6}{*}{\textbf{3}}
+ & \textbf{L40S} & 0\% & 8\% & 2\% \\
+ & \textbf{H100} & 0\% & 10\% & 2\% \\
+ & \textbf{A100} & 0\% & 8\% & 2\% \\
+ & \textbf{L4} & 0\% & 6\% & 2\% \\
+ & \textbf{T4} & 0\% & 10\% & 2\% \\
+ & \textbf{A10G} & 0\% & 10\% & 0\% \\
+\bottomrule
+\end{tabular}
+\caption{KernelBench result across multiple hardware types: Speedup (\fast{1}) over Torch Eager comparison of GPUs across different models and levels. The kernels used across different GPUs are the same as the ones generated for Single Attempt \textbf{without} hardware/platform specific information.}
+\label{tab:speedup-hardware-comparison}
+\end{table}

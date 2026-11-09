@@ -1,0 +1,64 @@
+\begin{table}[t]
+\vspace{-10pt}
+\centering
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=reforange,
+      colback=reforange!5,
+      colbacktitle=reforange!15,
+      coltitle=reforange,
+      boxrule=0.4pt,
+      title={\textbf{Prompts to optimize CoT}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+{\small
+"System Prompt":
+You are a top-tier AI chain-of-thought optimization expert. Your primary task is to review and restructure the content inside the \texttt{<think>} tags in Markdown documents. You must precisely preserve the core reasoning path from problem analysis to code implementation, while removing all redundant summarizing text, parameter recap lists, and any non-essential reasoning. Ultimately, you must output only the optimized, complete Markdown document.
+
+"User Prompt":
+
+\textbf{Optimization Goals}
+
+Reconstruct the content inside the \texttt{<think>} tags to retain the core reasoning path from problem analysis to code implementation, while deleting all non-essential and redundant information.
+
+\textbf{Content Editing Rules}
+
+1. \textbf{Remove redundant summaries}: You must delete all retrospective or summarizing text about \textbf{Tiling}, such as:
+    \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\topsep}{0pt}
+        \item ``Tiling parameter summary''
+        \item ``Organize all tiling parameters''
+        \item  Any similar parameter recap or retrospective content.
+    \end{itemize}
+
+2. \textbf{Remove self-negation}: You must delete all expressions of doubt, alternative-scheme discussion, or self-correction. The chain of thought should present a clear and confident design path.
+
+3. \textbf{Enhance pipeline design using the provided Kernel code}.
+
+4. \textbf{Do not modify or add any content outside the above three items.}
+
+\textbf{Structural Adjustment Rules}
+
+1. \textbf{Keep the single best block}: If multiple \texttt{<think>...</think>} blocks exist, you must keep only the most complete and clear one, and remove all others.
+
+\textbf{Input and Output}
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\topsep}{0pt}
+    \item \textbf{Input-1 (Kernel Code)}: The Kernel code section below, used to assist your understanding for supplementing pipeline design.
+    \item \textbf{Input-2 (Original Markdown)}: The CoT that must be processed.
+    \item \textbf{Output}: Return the fully optimized Markdown document directly. Do not include any additional explanations or annotations.
+\end{itemize}
+}
+\end{tcolorbox}
+\captionof{table}{General instructions used in the prompt.}
+\label{tab:optimization_prompt}
+\end{table}
+\clearpage

@@ -1,0 +1,115 @@
+% \begin{table}[t]
+%     \centering
+%     \small
+%     \renewcommand{\arraystretch}{1.1} % 稍微调整行高
+    
+%     % 总标题
+%     \caption{Evaluation results of kernel generation on NPUKernelBench across different sampling budgets ($k$). We report Compile Rate (CR), Execution Success Rate (ESR), and Speedup for Pass@1, Pass@10, and Pass@100.}
+%     \label{tab:pass_k_results}
+
+%     % --- 子表 (a): Pass@1 ---
+%     \begin{subtable}{1\linewidth}
+%         \centering
+%         \caption{Results for \textbf{Pass@1}}
+%         \begin{tabular}{l cc c c}
+%             \toprule
+%             \textbf{Model} & \textbf{Level} & \textbf{Compile Rate (\%)} & \textbf{Exec. Rate (\%)} & \textbf{Speedup ($\times$)} \\
+%             \midrule
+%             \multirow{2}{*}{QWen3-32B}      & Level 1    & 38.08 & 17.39 & 0.85 \\
+%             & Level 2    & 0.0 & 0.0 &  - \\ 
+%             & Mean       & 45.72 & 11.59 & - \\ 
+
+%             \multirow{2}{*}{QWen3-32B + SFT}  & Level 1       & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \multirow{2}{*}{QWen3-32B + SFT + RL}   & Level 1      & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \bottomrule
+%         \end{tabular}
+%         \label{subtab:pass1}
+%     \end{subtable}
+    
+%     \bigskip % 添加垂直间距
+
+%     % --- 子表 (b): Pass@10 ---
+%     \begin{subtable}{1\linewidth}
+%         \centering
+%         \caption{Results for \textbf{Pass@10}}
+%         \begin{tabular}{l cc c c}
+%             \toprule
+%             \textbf{Model} & \textbf{Level} & \textbf{Compile Rate (\%)} & \textbf{Exec. Rate (\%)} & \textbf{Speedup ($\times$)} \\
+%             \midrule
+%              \multirow{2}{*}{QWen3-32B}      & Level 1    & 52.4 & 21.5 & 0.85 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \multirow{2}{*}{QWen3-32B + SFT}  & Level 1       & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \multirow{2}{*}{QWen3-32B + SFT + RL}   & Level 1      & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \bottomrule
+%         \end{tabular}
+%         \label{subtab:pass10}
+%     \end{subtable}
+
+%     \bigskip % 添加垂直间距
+
+%     % --- 子表 (c): Pass@100 ---
+%     \begin{subtable}{1\linewidth}
+%         \centering
+%         \caption{Results for \textbf{Pass@100}}
+%         \begin{tabular}{l cc c c}
+%             \toprule
+%             \textbf{Model} & \textbf{Level} & \textbf{Compile Rate (\%)} & \textbf{Exec. Rate (\%)} & \textbf{Speedup ($\times$)} \\
+%             \midrule
+%              \multirow{2}{*}{QWen3-32B}      & Level 1    & 52.4 & 21.5 & 0.85 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \multirow{2}{*}{QWen3-32B + SFT}  & Level 1       & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \multirow{2}{*}{QWen3-32B + SFT + RL}   & Level 1      & 60.5 & 28.1 & 0.95 \\
+%             & Level 2    & 52.4 & 21.5 & 0.85 \\ 
+%             & Mean       & 52.4 & 21.5 & 0.85 \\ 
+%             \bottomrule
+%         \end{tabular}
+%         \label{subtab:pass100}
+%     \end{subtable}
+% \end{table}
+\begin{table}[t]
+\centering
+\small
+\renewcommand{\arraystretch}{1.1}
+\caption{Evaluation results of kernel generation on NPUKernelBench across different sampling budgets ($k$). We report Compilation Rate (CR), Execution Rate (ER), and overall Speedup for generated kernels.}
+\label{tab:pass_k_results_speed}
+\resizebox{1\linewidth}{!}{
+\begin{tabular}{l c cc cc cc c}
+\toprule
+\multirow{2}{*}{\textbf{Model}} & \multirow{2}{*}{\textbf{Level}} & \multicolumn{2}{c}{\textbf{Pass@1}} & \multicolumn{2}{c}{\textbf{Pass@10}} & \multicolumn{2}{c}{\textbf{Pass@100}} & \multirow{2}{*}{\textbf{Speedup ($\times$)}} \\
+\cmidrule(r){3-4} \cmidrule(r){5-6} \cmidrule(r){7-8}
+ & & CR (\%) & ER (\%) & CR (\%) & ER (\%) & CR (\%) & ER (\%) &  \\
+\midrule
+\multirow{4}{*}{Qwen3-32B} & Level 1 & 38.08 & 17.39 &71.62  &48.84  &75.00  &66.67  & 0.60 \\
+ & Level 2 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+ & Level 3 & 1.83 & 0.0 & 15.43 & 0.0 & 50.00 & 0.0 & 0.0 \\
+ \rowcolor{bggreen}
+ & Mean & 25.59 &11.59  & 49.46 & 32.56 & 55.56 & 44.44 & 0.60 \\
+\midrule
+\multirow{4}{*}{Qwen3-32B + SFT} & Level 1 &84.83  &38.28  &99.97  &86.82  &100  &94.44  & 0.56 \\
+ & Level 2 &60.5 &8  &96.54  &40.48  &100 &75  & 1.50 \\
+ & Level 3 &17 &0.17  &63.75  &1.67  &100 &16.67  & 0.00 \\
+ \rowcolor{bggreen}
+ & Mean &\textbf{71.89}  &27.31  &\textbf{95.18}  &67.06 &\textbf{100} & 81.48 &  0.75 \\
+\midrule
+\multirow{4}{*}{Qwen3-32B + SFT + RL} & Level 1 &82.17 &43.28 &99.92 &93.89 &100 &100 & 0.61 \\
+ & Level 2 &62.75 &14.25 &95.49 &64.28 &100 &91.67 & 1.86 \\
+ & Level 3 &14.67 &0.17  &61.12  &1.67  &100 &16.67  & 0.00 \\
+ \rowcolor{bggreen}
+ & Mean &70.35 &\textbf{32.04} &94.62 &\textbf{77.06} &\textbf{100} &\textbf{88.89} & 0.87 \\
+
+\bottomrule
+\end{tabular}}
+\end{table}
+

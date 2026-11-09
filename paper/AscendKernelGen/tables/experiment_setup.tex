@@ -1,0 +1,54 @@
+\begin{table}[t]
+\centering
+\caption{Overview of models and configurations used for dataset construction and two-stage training.}
+\label{tab:models_training}
+\resizebox{0.9\linewidth}{!}{
+\begin{tabular}{p{3.7cm} p{3.9cm} p{3.9cm} p{5.5cm}}
+\toprule
+\textbf{Stage} & \textbf{Model / Method} & \textbf{Role} & \textbf{Description} \\
+\midrule
+
+\multirow{9}{*}{Dataset Construction} %9代表description有9个物理行
+& DeepSeek-R1
+& Document \& Single-file CoT 
+& Document-based data generation and single-file Chain-of-Thought construction \\
+
+& Gemini 2.5 Pro
+& Project-level CoT 
+& Reasoning over complete kernel projects with multiple mutually referenced source files \\
+
+& DeepSeek-Reasoner 
+& Data Flywheel Refinement
+& Iterative correction and refinement of generated reasoning chains within the data flywheel \\
+\midrule
+
+\multirow{10}{*}{Supervised Fine-tuning}  %10代表description列有10个物理行
+& Qwen3-32B
+& Backbone Model 
+& Backbone model for supervised fine-tuning \\
+
+& Qwen3-1.7B / 4B / 8B / 14B / 32B / Coder-30B-A3B-Instruct 
+& Scaling Study 
+& Supervised fine-tuning across different model scales and architectures \\
+
+& Training Configuration 
+& Full FT / LoRA 
+& Learning rate $1.25\times10^{-6}$ (Full FT) vs. $1.25\times10^{-5}$ (LoRA), cosine decay, warm-up ratio 0.01, micro/global batch size 1/128, weight decay $1\times10^{-1}$, gradient clipping 1.0. \\
+
+\midrule
+
+\multirow{7}{*}{Reinforcement Learning}  %7代表description列有7个物理行
+& DPO
+& Optimization Objective 
+& Direct Preference Optimization with $\beta=0.1$ \\
+
+& Training Configuration 
+& Hyperparameters 
+& Learning rate $1\times10^{-6}$, cosine decay, warm-up ratio 0.1, global batch size 64, 150 training iterations \\
+
+& Preference Construction 
+& Ablation Analysis 
+& Analysis of different positive and negative sample selection strategies \\
+\bottomrule
+\end{tabular}}
+\end{table}

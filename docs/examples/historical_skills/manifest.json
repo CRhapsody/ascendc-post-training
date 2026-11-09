@@ -1,0 +1,188 @@
+{
+  "source": "../data_samples/agent_trajectories/add-custom.json",
+  "message_index": 1,
+  "record_type": "Historical skill bodies embedded in SFT trajectory; not current operational instructions.",
+  "skills": [
+    {
+      "name": "ascendc-code-gen",
+      "file": "ascendc-code-gen.md",
+      "block_sha256": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "cos-math": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "flash-attention-large-head": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "hans-decode": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "histogram-v2": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "interleave-rope": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "moe-compute-expert-tokens": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "moe-gating-topk-softmax": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "quant-matmul": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7",
+        "scaled-masked-softmax-v2": "deb88542a860f693dc2f711ff2b7fa563e6750f751e6dca2f30641cb3bd324f7"
+      }
+    },
+    {
+      "name": "ascendc-operator-project-init",
+      "file": "ascendc-operator-project-init.md",
+      "block_sha256": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "cos-math": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "flash-attention-large-head": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "hans-decode": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "histogram-v2": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "interleave-rope": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "moe-compute-expert-tokens": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "moe-gating-topk-softmax": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "quant-matmul": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e",
+        "scaled-masked-softmax-v2": "e584fe1d1963e9b3ddb4e30bbc4aeeeccccb36caf0893849be1738d6cedb0f3e"
+      }
+    },
+    {
+      "name": "ascendc-translator",
+      "file": "ascendc-translator.md",
+      "block_sha256": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "cos-math": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "flash-attention-large-head": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "hans-decode": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "histogram-v2": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "interleave-rope": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "moe-compute-expert-tokens": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "moe-gating-topk-softmax": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "quant-matmul": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836",
+        "scaled-masked-softmax-v2": "e7a944dc4830b3c152c72752a6d9e33281f62fc336281db5ce4408f4dc86d836"
+      }
+    },
+    {
+      "name": "ascendc-case-simplifier",
+      "file": "ascendc-case-simplifier.md",
+      "block_sha256": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "cos-math": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "flash-attention-large-head": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "hans-decode": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "histogram-v2": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "interleave-rope": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "moe-compute-expert-tokens": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "moe-gating-topk-softmax": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "quant-matmul": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4",
+        "scaled-masked-softmax-v2": "14dd72a0d7eec0cedef77baace5da2023514da0dc166afaaa62ad49672f77bf4"
+      }
+    },
+    {
+      "name": "ascendc-design-doc-generator",
+      "file": "ascendc-design-doc-generator.md",
+      "block_sha256": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "cos-math": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "flash-attention-large-head": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "hans-decode": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "histogram-v2": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "interleave-rope": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "moe-compute-expert-tokens": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "moe-gating-topk-softmax": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "quant-matmul": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113",
+        "scaled-masked-softmax-v2": "800b251d0ad6d7b9bb0ad637ac8bc23b6525615c94c7f165201f23f9e6b9b113"
+      }
+    },
+    {
+      "name": "ascendc-performance-analyzer",
+      "file": "ascendc-performance-analyzer.md",
+      "block_sha256": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "cos-math": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "flash-attention-large-head": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "hans-decode": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "histogram-v2": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "interleave-rope": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "moe-compute-expert-tokens": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "moe-gating-topk-softmax": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "quant-matmul": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8",
+        "scaled-masked-softmax-v2": "a2ea2d17f4f472f311cb27b763e56688af1cbe0290f900dd8255184f1c13d0d8"
+      }
+    },
+    {
+      "name": "ascendc-precision-debug",
+      "file": "ascendc-precision-debug.md",
+      "block_sha256": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "cos-math": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "flash-attention-large-head": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "hans-decode": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "histogram-v2": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "interleave-rope": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "moe-compute-expert-tokens": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "moe-gating-topk-softmax": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "quant-matmul": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5",
+        "scaled-masked-softmax-v2": "620a998e6744596b2e422f8e42f64b2dcaa513817cc3e62ca713d0cde38c97f5"
+      }
+    },
+    {
+      "name": "ascendc-precision-tuning",
+      "file": "ascendc-precision-tuning.md",
+      "block_sha256": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "cos-math": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "flash-attention-large-head": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "hans-decode": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "histogram-v2": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "interleave-rope": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "moe-compute-expert-tokens": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "moe-gating-topk-softmax": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "quant-matmul": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200",
+        "scaled-masked-softmax-v2": "b2a39f27f76cac6aa61197dd5f63e7e2ab5c13e1081a9bd5534530d262c27200"
+      }
+    },
+    {
+      "name": "ascendc-tilelang-designer",
+      "file": "ascendc-tilelang-designer.md",
+      "block_sha256": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "cos-math": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "flash-attention-large-head": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "hans-decode": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "histogram-v2": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "interleave-rope": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "moe-compute-expert-tokens": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "moe-gating-topk-softmax": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "quant-matmul": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b",
+        "scaled-masked-softmax-v2": "8b746e6757a072c17606a69254c761b708101a1370904740bbbfa4013011978b"
+      }
+    },
+    {
+      "name": "ascendc-trace-recorder",
+      "file": "ascendc-trace-recorder.md",
+      "block_sha256": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+      "identical_across_all_ten_samples": true,
+      "sample_block_hashes": {
+        "add-custom": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "cos-math": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "flash-attention-large-head": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "hans-decode": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "histogram-v2": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "interleave-rope": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "moe-compute-expert-tokens": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "moe-gating-topk-softmax": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "quant-matmul": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687",
+        "scaled-masked-softmax-v2": "44616837f610e02589f6f994841154aa4f6bdf78ff688574df10ab4e4e592687"
+      }
+    }
+  ],
+  "reference_link_note": "Original historical relative references are preserved; referenced files are not included in these entry-document snapshots. Use current mappings in agent-skill-call-guide.md or the original trajectory tool replies."
+}

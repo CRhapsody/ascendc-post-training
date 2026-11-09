@@ -1,0 +1,46 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"wrappingWidth":340}}}%%
+flowchart TB
+    cosContext["M3、M7｜参考与用例<br/>逐元素 cos，9 个 case"]:::context
+    cosDesign["M9–31｜修正模板路径<br/>保留 9 例，写 design.md"]:::action
+    cosCode["M66–77｜生成完整工程<br/>初版 wrapper AST 通过"]:::passed
+    cosHook["M78–82｜修正 hook 命令后<br/>DataCopyPad 三参编译失败"]:::failed
+    cosInitFail["M83–86｜补第四参数<br/>构建成功，初始化参数失败"]:::failed
+    cosTimeout1["M91–102｜修复初始化接口<br/>第 1 轮设备超时"]:::failed
+    cosTimeout2["M105–112｜调整尾块长度<br/>第 2 轮设备超时"]:::failed
+    cosTimeout3["M115–126｜改搬运并回模板<br/>第 3 轮设备超时"]:::failed
+    cosTimeout4["M137–146｜加 barrier 与 padding<br/>第 4 轮设备超时"]:::failed
+    cosTimeout5["M147–156｜换到设备 0<br/>第 5 轮设备超时"]:::failed
+    cosTimeout6["M157–170｜清理重编与 bf16<br/>第 6 轮设备超时"]:::failed
+    cosControl["M177–178｜运行 Muls 对照<br/>Muls 的 9 个 case 通过"]:::passed
+    cosDispatch["M179–182｜运行时 dtype 分发<br/>再次发生搬运编译错误"]:::failed
+    cosTimeout7["M185–192｜保留 Muls 结构改 Cos<br/>第 7 轮设备超时"]:::failed
+    cosUbFix["M193–215｜查 Cos 头文件<br/>UB 系数改为 40"]:::action
+    cosPass["M217–220｜重新评测<br/>CosMath 9 / 9 matched"]:::passed
+    cosPerfFail["M224–225｜首次性能测试<br/>初始化参数再次失败"]:::failed
+    cosPerfRepair["M232–235｜修改本地 reference<br/>get_init_inputs 返回空列表"]:::action
+    cosPerf["M236–239｜9 例性能报告<br/>约 0.87 倍，整体更慢"]:::context
+    cosSummary["M240–249｜无新增全量重测<br/>读取精确值 0.8709，声明完成"]:::uncertain
+    cosContext --> cosDesign
+    cosDesign --> cosCode
+    cosCode --> cosHook
+    cosHook --> cosInitFail
+    cosInitFail --> cosTimeout1
+    cosTimeout1 --> cosTimeout2
+    cosTimeout2 --> cosTimeout3
+    cosTimeout3 --> cosTimeout4
+    cosTimeout4 --> cosTimeout5
+    cosTimeout5 --> cosTimeout6
+    cosTimeout6 --> cosControl
+    cosControl --> cosDispatch
+    cosDispatch --> cosTimeout7
+    cosTimeout7 --> cosUbFix
+    cosUbFix --> cosPass
+    cosPass --> cosPerfFail
+    cosPerfFail --> cosPerfRepair
+    cosPerfRepair --> cosPerf
+    cosPerf --> cosSummary
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:1.5px;
+    classDef passed fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.5px;
+    classDef failed fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.5px;
+    classDef context fill:#F1F5F9,stroke:#64748B,color:#0F172A,stroke-width:1.5px;
+    classDef uncertain fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:1.5px;

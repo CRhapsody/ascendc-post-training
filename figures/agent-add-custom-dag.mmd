@@ -1,0 +1,43 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569"},"flowchart":{"curve":"linear","nodeSpacing":28,"rankSpacing":30}}}%%
+flowchart TB
+    reference["M6–10 读取参考与目录<br/>torch.add，简单算子"]
+    project["M16–20 初始化工程<br/>复制 helper 失败"]
+    helper["M21–24 Glob 定位<br/>改路径后复制成功"]
+    cases["M29–33 读取并备份<br/>5 个 case，不做精简"]
+    design["M40–48 读取设计资料<br/>写入 design.md"]
+    templates["M55–71 读取模板<br/>参考历史 3_Add 实现"]
+    code["M72–82 生成 AscendC<br/>Host、Device 与封装"]
+    ast["M83–85 AST 检查通过<br/>仅证明未检出规定退化"]
+    hookFailure["M86–88 Hook 执行失败<br/>把 export 当作可执行文件"]
+    initFailure["M89–95 再次构建验证<br/>Model 初始化参数错误"]
+    adapter["M96–105 对照验证脚本<br/>初始化参数改为 []"]
+    invalidCall["M106–107 Bash 调用失败<br/>缺少 command 参数"]
+    verified["M108–112 重测 5/5 通过<br/>MERE 约 7.3e-5"]
+    performance["M119–128 性能测试<br/>总体 0.59x，慢于参考"]
+    reuse["M131–136 全量阶段<br/>复用前述 5 case 结果"]
+    trace["M141–147 读取性能 JSON<br/>写 trace.md 并总结"]
+    reference --> project
+    project --> helper
+    helper --> cases
+    cases --> design
+    design --> templates
+    templates --> code
+    code --> ast
+    ast --> hookFailure
+    hookFailure --> initFailure
+    initFailure --> adapter
+    adapter --> invalidCall
+    invalidCall --> verified
+    verified --> performance
+    performance --> reuse
+    reuse --> trace
+    classDef action fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef pass fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    classDef fail fill:#fee2e2,stroke:#dc2626,color:#0f172a;
+    classDef context fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef limited fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    class reference,cases context;
+    class helper,design,templates,code,adapter,trace action;
+    class ast,verified pass;
+    class project,hookFailure,initFailure,invalidCall fail;
+    class performance,reuse limited;

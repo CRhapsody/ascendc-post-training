@@ -1,0 +1,98 @@
+\label{sec-5:analysis}
+In the last section, we found that KernelBench is a challenging benchmark for today's models. In this section, we conduct case studies to explore opportunities for improvement in future models and AI systems.
+
+\subsection{Case Study: Leveraging the KernelBench Environment Feedback at Test-Time}
+As observed in Section~\ref{sec-4.2-correctness},  execution failures are the most frequent failure mode in LM-generated kernels. The environment provided by KernelBench allows us to collect rich signals, including compiler errors, correctness checks, and runtime profiling metrics, all of which can be fed back in to the LM to help it resolve kernel failures. To explore how well LMs can use this feedback, we evaluate and compare two baselines: (1) generating multiple parallel samples from the LM per KernelBench task and (2) sequentially generating kernels per KernelBench task by allowing the LM to iteratively refine using the execution feedback. 
+
+
+\subsubsection{Repeated Sampling} 
+The KernelBench environment enables programmatic verification of LM-generated kernels, 
+allowing us to collect and evaluate multiple LM generations \textit{per task} ~\cite{brown2024largelanguagemonkeysscaling,Li_2022,grubisic2024prioritysamplinglargelanguage}. We evaluate this \textit{repeated sampling} approach using $\text{fast}_{p}@k$, which measures the percentage of tasks where the model generated \textbf{at least one functionally correct kernel that is $p$ times faster than PyTorch Eager when drawing $k$ samples}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.43\textwidth}
+    \textbf{Repeated sampling helps LMs discover more fast and correct solutions.} Figure \ref{fig-multisample-passk} shows that repeated sampling with high temperature improves \fast{1} as $k$ increases across all three levels with both DeepSeek-V3 and Llama 3.1 70B. Notably, on Level 2, DeepSeek-V3 reaches a \fast{1} of 37\% with $k=100$ samples, compared to just 4\% in the one-shot baseline. Examining the samples, we find that high-temperature sampling helps explore the solution space, increasing the chances of generating error-free kernels with better optimizations. However, if a model has a very low inherent probability of solving a task, simply increasing the sampling budget has limited impact. For example, DeepSeek-V3 was never able to generate any correct solution for a group of 34 convolution variants in Level 1, even when attempting with 100 samples.
+    
+    \end{minipage}
+    \hfill
+        \begin{minipage}{0.55\textwidth}
+        
+    \begin{center}
+    \vspace{-2mm}
+    \centerline{\includegraphics[width=\columnwidth]{figures/monkey_fast1.png}}
+    \caption{\textbf{Repeated sampling helps discover more correct and performant kernels}. As the number of repeated samples $k$ increases (up to 100), we observe that $\text{fast}_1$@k improves for both DeepSeek-V3 and Llama 3.1-70B Instruct across all 3 KernelBench levels. We also observe a larger increase in correct solutions for Level 2 kernels. }
+    \label{fig-multisample-passk}
+    \end{center}
+
+    \end{minipage}
+    
+\end{figure}
+
+\subsubsection{Iterative Refinement of Generations}
+\label{sec:iterative-refinement}
+
+The KernelBench environment is well-suited for collecting compiler feedback, execution errors, and timing analysis using tools like the PyTorch profiler as ground-truth signals. We investigate whether leveraging this feedback can help LMs to iteratively refine their generations.
+
+
+\begin{figure}[H]
+    \centering
+    \vspace{-2mm}
+    \includegraphics[width=1.0\linewidth]{figures/multi-turn-workflow.png}
+    \caption{\textbf{The KernelBench framework enables models to receive and leverage feedback during iterative refinement.} These ground-truth signals include NVCC compiler error messages, execution statistics (e.g. correctness checks and wall clock time), and the PyTorch profiler (operator timing breakdown). }
+    \vspace{-2mm}
+    \label{fig:multi-turn-feedback}
+\end{figure}
+ 
+\noindent We provide feedback to the model after each generation in a multi-turn process: after the initial generation, we provide the model with its previous generation $G$, as well as compiler/execution feedback $E$ and/or profiler output $P$ over its current generation. We define each generation and subsequent feedback as a \textit{turn}, and run this \textbf{Iterative Refinement} process over $N$ turns. For each turn, we measure $\text{fast}_{p}@N$, which is the percentage of tasks where the model generated \textbf{at least one} functionally correct kernel that is $p$ times faster than PyTorch Eager by turn $N$.
+\FloatBarrier  
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.47\textwidth}
+    \textbf{Leveraging execution feedback helps reduce errors and improves overall speedups over time.} We examine the \fast{1} behavior at turn $N=10$ in Table \ref{table:speedup-method-comparison} and find that iterative refinement consistently improves performance across models and levels of KernelBench. DeepSeek-R1 on Level 2 results in the most notable improvement, where the combination of execution feedback $E$ and profiler feedback $P$ boosts \fast{1} from $36\%$ to $72\%$ (shown in Figure~\ref{fig-multiturn-increase-k}). 
+    \\\\
+    Furthermore, by examining iterative refinement trajectories, we find that models self-correct more effectively with execution feedback $E$, fixing issues especially related to execution errors. DeepSeek-R1 on Level 1 and 2 can generate a functional kernel on \textgreater 90\% of the tasks within $10$ turns of refinement (Table \ref{table:fast0-method-comparison}). However, the remaining incorrect kernels almost always fail due to functional incorrectness, likely because correctness feedback is less granular than execution failure messages. We include successful and failed examples of iterative refinement trajectories in Appendix~\ref{appendix:iterative-refinement}. 
+    
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.49\textwidth}
+        
+       \centering
+        \vspace{-2mm}
+        \includegraphics[width=\textwidth]{figures/multi-turn-trend-by-k.png} % Slightly reduced width for better wrapping
+        \caption{\textbf{Iterative refinement with execution feedback $E$ and profiling information $P$ enable models to improve kernel generations over turns}, as shown in the $\text{fast}_{1}@N$ trajectory of DeepSeek-R1 on Level 2. The percentage of problems where the best generated kernel up to turn $N$ is correct and faster than PyTorch Eager consistently increases with the number of turns.}
+        \vspace{-2mm}
+        \label{fig-multiturn-increase-k}
+
+    \end{minipage}
+    
+\end{figure}
+
+\FloatBarrier  
+
+\subsubsection{Comparing Repeated Sampling and Iterative Refinement}
+\input{tables/speedup_table}
+
+In Table~\ref{table:speedup-method-comparison}, we compare repeated sampling and iterative refinement given a fixed budget of $10$ inference calls. Both methods provide meaningful improvements over the one-shot baseline, with iterative refinement being more effective in 5 of the 6 cases. However, ultimately we find that the effectiveness of the test-time methods is inherently dependent on the quality of the base model. For instance, with repeated sampling, DeepSeek-V3 consistently outperforms Llama-3.1 70B across all three levels. Similarly, with iterative refinement, DeepSeek-R1 consistently improves using feedback $E$ and $P$, while DeepSeek-V3 and Llama-3.1 70B does not always benefit from having such information. 
+
+\vspace{-2mm}
+\subsection{Case Study: Generating Hardware-Efficient Kernels via Hardware Knowledge}
+\label{subsection:hardware-info-case-study}
+
+It is clear that LMs demonstrate limited success at generating hardware-efficient kernels. This is likely due to the scarcity of kernel code in the training data and the fact that the optimal kernel may need to change depending on the hardware platform-specific properties, as discussed in Section~\ref{section:perf-across-hardware}. In this case study, we explore providing 1) in-context examples of best-practices for kernel engineering and 2) in-context hardware specification details.
+
+
+\subsubsection{Hardware-aware In-Context Examples}
+\label{subsection:few-shot}
+
+Well-written kernels often use techniques such as fusion, tiling, recompute, and asynchrony to maximize performance. We find that most of the one-shot generated kernels evaluated in \Cref{sec-4:baseline} often do not use these techniques. Here, we explore whether providing explicit in-context examples that use these techniques can help the LMs improve their performance on KernelBench. Specifically, we include three in-context examples: GeLU~\cite{hendrycks2023gaussianerrorlinearunits} using operator fusion, matrix multiplication using tiling ~\cite{mills2024cuda}, and a minimal Flash-Attention~\cite{dao2022flashattention, kim2024flashattention} kernel that demonstrates shared memory I/O management.
+\\\\
+\noindent \textbf{In-context examples degrade the LM's \textit{overall} \fast{1} score since LMs attempt more aggressive optimization strategies, but result in more execution failures.} OpenAI o1's generations are 25\% longer on average using the few-shot examples, compared to the generations produced by \Cref{sec-4:baseline} baseline. However, among the correct solutions, the LMs apply interesting optimizations: we find that on 77\% of GEMM variants in KernelBench Level 1, o1 applies tiling and improves speed over the one-shot baseline (although remains slower than PyTorch Eager due to the lack of tensor core utilization). On Level 2, o1 applies aggressive shared memory I/O management on 11 problems, and is able to outperform PyTorch Eager (See Appendix~\ref{appendix:few-shot-study}).
+
+\subsubsection{Specifying Hardware Information} 
+\label{subsection:hardware-prompting-study}
+As discussed in Section~\ref{section:perf-across-hardware}, kernel performance varies depending on the hardware platform. For instance, FlashAttention-2~\cite{dao2023flashattention2} degrades 47\% in hardware utilization going from the NVIDIA A100 to H100 GPU. FlashAttention-3~\cite{dao2024flashattention3}, an entirely different algorithm, was written for the H100. In this study, we explore whether LMs can use (1) hardware specifications such as the GPU type (H100, A100, etc.), memory sizes, bandwidths, TFLOPS and (2) hardware knowledge (e.g. definitions of threads, warps, thread-blocks, streaming multiprocessors) in-context to generate improved kernels (See Appendix~\ref{appendix:cross-hardware-study} for more detail on the context). 
+\\\\
+\noindent \textbf{Models rarely generate kernels that are optimized for the underlying hardware, highlighting room for improvement for future models.} Certain generations of GPUs (e.g. H100) feature a variety of new hardware units and instructions from their predecessors. Providing hardware information does not significantly impact the outputs of Llama 3.1 70B or DeepSeek-V3. 
+
+Interestingly, we find that a subset of OpenAI o1 and DeepSeek-R1 generated kernels use hardware-specific instructions and optimizations. R1 attempts to generate warp matrix multiply-accumulate (\texttt{wmma}) instructions (Figure \ref{fig:example_r1_generated_kernel_hw}) for approximately $50\%$ of the Level 1 matrix multiplication problems, although most fail to compile. Among the functionally correct generations, R1 and o1 produce 1-3 outliers per level that are $\geq 2\times$ faster than the \Cref{sec-4:baseline} baselines. Overall, we find that LMs are better at adjusting their approaches when provided with few-shot examples in \Cref{subsection:few-shot} than with hardware information.

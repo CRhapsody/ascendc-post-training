@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\label{tab:few_shot_kernel_fusion_results_level1}
+\begin{tabular}{lccc}
+    \toprule
+    \textbf{Problem Name} & \textbf{Baseline (ms)} & \textbf{Few-Shot (ms)} & \textbf{Ref Torch (ms)} \\
+    \midrule
+    3D Tensor Matrix Multiplication & 20.9 & 7.71 & 1.45 \\
+    Matmul for Upper-Triangular Matrices & 14 & 5.39 & 2.98 \\
+    Matrix Scalar Multiplication & 1.19 & 0.811 & 0.822 \\
+    Standard Matrix Multiplication & 3.39 & 2.46 & 0.397 \\
+    Matmul with Transposed Both & 3.44 & 2.67 & 0.412 \\
+    Matmul with Transposed A & 3.61 & 2.99 & 0.384 \\
+    4D Tensor Matrix Multiplication & 366 & 338 & 36 \\
+    Tall Skinny Matrix Multiplication & 3.39 & 3.59 & 1.9 \\
+    Matmul with Diagonal Matrices & 0.221 & 0.237 & 2.83 \\
+    \bottomrule
+\end{tabular}
+
+\caption{Performance comparison of the Section \ref{4.1} baseline and few-shot prompting in level 1 matrix multiplication problems.}
+
+\end{table}

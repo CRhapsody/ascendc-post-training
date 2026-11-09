@@ -1,0 +1,89 @@
+All evaluations are conducted on a bare-metal NVIDIA L40S GPU with Ada Lovelace architecture unless otherwise stated (such as the device generalization experiments in Section~\ref{section:perf-across-hardware} and the hardware case study in \ref{subsection:hardware-info-case-study}). The NVIDIA L40S has 48 GB of HBM memory and operates at 300W. Our environment uses Python \texttt{3.10}, PyTorch \texttt{2.5.0+cu124}, and CUDA \texttt{12.4}, which is also where our PyTorch Eager and \texttt{torch.compile} baselines are derived from.
+
+
+\subsection{Kernel Evaluation Setup}
+Recall the KernelBench task entails a PyTorch reference module \texttt{Model} as baseline, and model-generated PyTorch architecture \texttt{ModelNew} with custom inline CUDA kernel. 
+\\\\
+\noindent For \textbf{correctness}, we set \textit{num\_correctness} to 5, where we check equivalence of output between reference architecture \texttt{Model} and generated architecture with custom kernel \texttt{ModelNew} with 5 randomized inputs. We elaborate on our choice in Appendix~\ref{append:correctness-vary}.
+\\\\
+\noindent For \textbf{performance}, we measure the wall-clock execution time of \texttt{nn.module.forward} for both \texttt{Model} and \texttt{ModelNew}.  We ensure only one kernel is being evaluated (no other CUDA process) on current GPU. We warm up for 3 iterations and then set  \textit{num\_profile} to 100 times which measures the elapsed execution time signaled between CUDA events \texttt{torch.cuda.Event}.  We take the mean of the 100 trials, and also note its max, min, and standard deviation. While the wall clock time might vary for every trial, we note our coefficient of variation (CV): $\text{std} / \text{mean}$ is consistently $<3\%$, we use the mean of both measured wall clock time for comparisons. 
+
+To compute the speedup of generated architecture over baseline architecture for individual problems, we use the mean for both $\text{speedup} = T_{Model} / 
+ T_{ModelNew}$. For example, if $T_{Model}=2$ ms and $T_{ModelNew}=1$ ms, we have a 2x speedup with the newly generated kernel. We compare this speedup with our speedup threshold parameter $p$ (as explained in section \ref{sec-metric-design}) to compute \fast{p} scores. 
+
+\subsection{Correctness Analysis Varying Number of Randomly Generated Inputs}
+\label{append:correctness-vary}
+Checking equivalence of programs in a formal sense is undecidable. "The Halting Problem" \citep{turing1936a} states that it is impossible to decide, in general, whether a given program will terminate for every possible input. This problem naturally extends to checking equivalence because in order to check whether two programs are equivalent, it is necessary to check their behavior for all inputs, including cases where one or both programs may not terminate. Since determining whether a program halts on a given input is undecidable (the Halting Problem), checking equivalence also becomes undecidable.
+
+Approximate or heuristic methods are often used in practice for checking program equivalence. Random testing is the most common practical approach, where the program is run with sets of randomly chosen inputs, and their outputs are compared. Random testing is particularly effective for AI kernels, where control flow is simpler and the focus is primarily on numerical correctness. By using diverse inputs, it can uncover errors in computations or memory handling with high probability. Evaluating correctness more systematically, especially in the presence of subtle hardware-specific behavior, is an area for further exploration. Future work could investigate formal verification tools to provide stronger guarantees of equivalence.
+
+We use five sets of random inputs for correctness, which is a good tradeoff between the ability to catch errors and efficiency. In an experiment with 100 generated kernels, the results were as follows: 50 kernels were correct (all 5/5 and 100/100), 19 had output value mismatches (19 0/5 and 0/100), 4 had output shape mismatches, 10 encountered runtime errors, and 17 had compilation errors. Notably, the 0/5 and 0/100 failures indicate that no partial correctness was observed.
+
+\subsection{Distribution of Model Performance for One-Shot Baseline} \label{appendix:one-shot-baseline-speedup}
+Here we examine the quality of (functionally correct) kernel generations across a wide variety of models. Figure~\ref{fig-greedy-speedup-box-whiskers} shows the distribution of speedups for various kernels across different levels and models. The median speedup for both Level 1 and Level 3 are less than 1, and the median speedup for Level 2 is only slightly above one. Level 1 has the most significant outliers, in one case showing a speedup greater than 10. We explored some of these outlier cases in greater detail in Section~\ref{sec-6:discussion}.
+\\\\
+\noindent \textbf{Reasoning-optimized models (OpenAI-o1 and DeepSeek-R1) perform the best of out-of-the-box across all levels.} These models demonstrate superior kernel generation capabilities, particularly excelling at Level 2 tasks (which mainly involve kernel fusion). In contrast, Llama 3.1 models (both 405B and 70B) perform poorly regardless of model size, suggesting that larger models do not necessarily guarantee better results for this task. DeepSeek-R1, while strong at Level 1 and 2, suffers significantly at Level 3, often generating incorrect kernels.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{figures/greedy_speedup_box_whiskers.png}
+    \caption{A box and whisker plot of the speedup relative to Torch Eager of (correct) kernels generated by various models in the one-shot baseline setting. We also write the percentage of correctly generated kernels next to the model name. We observe that among most models, the median speedup for correctly generated kernels is below 1.}
+    \label{fig-greedy-speedup-box-whiskers}
+\end{figure}
+
+
+\subsection{PyTorch Baselines}
+PyTorch offers two common execution modes: Eager and \texttt{torch.compile}. 
+Aside from the results shown in Table~\ref{table:greedy-baseline}, all performance analysis is evaluated against PyTorch Eager. 
+\\\\
+\noindent \textbf{PyTorch Eager} is the default execution mode of PyTorch, which dynamically executes computation by invoking calls to highly optimized closed-source kernels. 
+\\\\
+\noindent \textbf{PyTorch Compile} or \texttt{torch.compile} uses rule-based heuristics over the underlying computation graph during an initial compilation phase and invokes various backends to perform optimizations like kernel fusion and graph transformations. In Table~\ref{table:greedy-baseline}, our performance baseline for \texttt{torch.compile} assumes the default configuration using PyTorch Inductor in default mode. Furthermore, we \textbf{exclude} the \texttt{torch.compile} compile time in our timing analysis, as we are only interested in the raw runtime behavior. \texttt{torch.compile} features multiple other backends and configurations, which we describe in Table \ref{tab:pytorch_configurations}. 
+
+We observe that the \texttt{torch.compile} baseline runtime is generally faster on Level 2 and 3 of KernelBench reference problems compared to PyTorch Eager, mostly due to the availability of graph-level optimizations like operator fusion. However, on Level 1 problems, \texttt{torch.compile} can exhibit higher runtimes than PyTorch Eager, which can be attribute to empirically-reproducible runtime overhead for \texttt{torch.compile} (\textit{not compile time}) that is significant for small kernels.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{llll}
+
+\hline
+\textbf{Configuration} & \textbf{Backend} & \textbf{Mode} & \textbf{Description} \\ 
+\hline
+PyTorch (Eager)          & -                & -             & Standard PyTorch eager execution \\ 
+Torch Compile          & inductor         & default       & Default \texttt{torch.compile} behavior \\ 
+Torch Compile          & inductor         & reduce-overhead & Optimized for reduced overhead \\ 
+Torch Compile          & inductor         & max-autotune  & Max autotuning enabled \\ 
+Torch Compile          & inductor         & max-autotune-no-cudagraphs & Max autotuning without CUDA graphs \\ 
+Torch Compile          & cudagraphs       & -             & CUDA graphs with AOT Autograd \\ 
+\hline
+\end{tabular}
+\caption{Configurations and modes for PyTorch execution and optimization backends.}
+\label{tab:pytorch_configurations}
+\end{table}
+
+% Greey baseline table
+\noindent \textbf{Other \texttt{torch.compile} backends}. In Table~\ref{table:greedy-baseline-compile}, we show more one-shot baseline results for \fast{1} against some of the other \texttt{torch.compile} baselines. We note on some other configurations \fast{1} drops especially for Level 2, as the \texttt{torch.compile} backends apply more aggressive optimization (at the cost of extra compile-time overhead, which we do not measure). Due to the variability of \texttt{torch.compile} across configurations, we focus our analysis on PyTorch Eager. 
+
+\begin{table}[h]
+\centering
+\setlength{\tabcolsep}{2pt} % default is about 6pt
+\begin{tabular}{lccc|ccc|ccc|ccc|ccc}
+    \toprule
+    \fast{1} over: & \multicolumn{3}{c}{\makecell{torch.compile \\ default}} & \multicolumn{3}{c}{cudagraphs} & \multicolumn{3}{c}{max-autotune} & \multicolumn{3}{c}{\makecell{max-autotune\\no-cudagraphs}} & \multicolumn{3}{c}{reduce-overhead} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10} \cmidrule(lr){11-13} \cmidrule(lr){14-16}
+    KernelBench Level & 1 & 2 & 3 & 1 & 2 & 3 & 1 & 2 & 3 & 1 & 2 & 3 & 1 & 2 & 3 \\
+    \midrule
+    Claude 3.5 Sonnet   & \underline{29\%} & 2\%  & \underline{2\%}  & 31\% & 7\%  & 2\%  & 31\% & 2\% & 0\% & 29\% & 2\% & 2\% & 31\% & 2\% & \underline{0\%}  \\
+    DeepSeek V3         & 20\%  & 2\%  & \underline{2\%}  & 21\% & 4\%  & \underline{20\%}  & 21\% & 2\% & \underline{2\%} & 20\% & 2\% & 2\% & 21\% & 2\% & \underline{0\%}  \\
+    DeepSeek R1         & \textbf{38\%} & \textbf{37\%} & \underline{2\%} & \textbf{42\%} & \textbf{52\%} & 0\% & \textbf{42\%} & \textbf{29\%} & 0\% & \textbf{38\%} & \textbf{32\%} & \underline{4\%} & \textbf{42\%} & \textbf{28\%} & \underline{0\%}  \\
+    GPT-4o              & 18\%  & 4\%  & \textbf{4\%}  & 22\% & 6\%  & 6\%  & 21\% & 4\% & \underline{2\%} & 18\% & 3\% & \underline{4\%} & 21\% & 4\% & \underline{0\%}  \\
+    Llama 3.1-70B Inst. & 11\%  & 0\%  & 0\%  & 12\% & 0\%  & 0\%  & 12\% & 0\% & 0\% & 11\% & 0\% & 0\% & 12\% & 0\% & \underline{0\%}  \\
+    Llama 3.1-405B Inst.& 16\%  & 0\%  & 0\%  & 16\% & 0\%  & 4\%  & 16\% & 0\% & 0\% & 16\% & 0\% & 0\% & 16\% & 0\% & \underline{0\%}  \\
+    OpenAI O1           & 28\% & \underline{19\%}  & \textbf{4\%}  & \underline{33\%} & \underline{37\%}  & \textbf{26\%}  & \underline{34\%} & \underline{8\%} & \textbf{4\%} & \underline{30\%} & \underline{19\%} & \textbf{6\%} & \underline{34\%} & \underline{8\%} & \textbf{2\%}  \\
+    \bottomrule
+\end{tabular}
+
+\caption{We compare KernelBench  \texttt{torch.compile} baseline runtime across various configurations, all measured on NVIDIA L40S, in addition to what is showed in Table \ref{table:greedy-baseline}.}
+
+\label{table:greedy-baseline-compile}
+\end{table}

@@ -1,0 +1,106 @@
+\begin{wraptable}{r}{0.54\textwidth}
+\vspace{-10pt}
+\centering
+\begin{tcolorbox}[
+    rounded corners,
+    arc=3pt,
+    enhanced,
+    width=0.54\textwidth,
+    colframe=codegreen, % <----- CHANGED
+    colback=white,
+    title=\textbf{An example of Kernel Code},
+    fonttitle=\bfseries\small,
+    boxrule=0.6pt,
+    left=2pt,
+    right=2pt,
+    top=0pt,
+    bottom=1pt
+  ]
+  
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Host}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=-5pt,
+      bottom=-5pt
+    ]
+\begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python]
+namespace optiling {
+static ge::graphStatus TilingFunc(gert::TilingContext *context)
+{ // Initialize tiling data structures and parameter configurations
+    TilingData tiling;
+    return ge::GRAPH_SUCCESS;
+}
+} // namespace optiling
+namespace ops {
+class AddCustom : public OpDef {
+public:
+    explicit AddCustom(const char *name) : OpDef(name)
+    {// Define operator input/output types and computation configuration
+    }
+};
+OP_ADD(AddCustom);
+} // namespace ops
+\end{lstlisting}
+\end{tcolorbox}
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Kernel}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=-5pt,
+      bottom=-5pt
+    ]
+\begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python]
+class KernelAdd {
+public:
+    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength, uint32_t tileNum) { // Initialize global buffers and queues
+    }
+    __aicore__ inline void Process() {
+        for (int32_t i = 0; i < loopCount; i++) {
+            CopyIn(i);
+            Compute(i);
+            CopyOut(i);
+        }
+    }
+private:
+    __aicore__ inline void CopyIn(int32_t progress) {
+    // Copy xGm and yGm to local tensors via inQueue
+    }
+    __aicore__ inline void Compute(int32_t progress) {
+    // Dequeue xLocal, yLocal; perform Add; enqueue zLocal
+        LocalTensor xLocal = inQueueX.DeQue<DTYPE_X>();
+        LocalTensor yLocal = inQueueY.DeQue<DTYPE_Y>();
+        LocalTensor zLocal = outQueueZ.AllocTensor<DTYPE_Z>();
+        Add(zLocal, xLocal, yLocal, tileLength);
+    }
+    __aicore__ inline void CopyOut(int32_t progress) {
+    // Copy zLocal back to zGm
+    }
+};
+extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z) {
+    KernelAdd op;
+    op.Init(x, y, zzh);
+    op.Process();
+}
+\end{lstlisting}
+\end{tcolorbox}
+\end{tcolorbox}
+\vspace{-15pt}
+\captionof{table}{AscendC kernel for vector addition.}
+\label{tab:kernel_example}
+\vspace{-30pt}
+\end{wraptable}

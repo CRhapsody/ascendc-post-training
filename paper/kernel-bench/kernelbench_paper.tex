@@ -1,0 +1,307 @@
+\documentclass{article} % For LaTeX2e
+% \usepackage{iclr2025_conference,times}
+
+% \usepackage{macros}
+\usepackage{arxiv}
+
+\newtoggle{arxiv}
+\toggletrue{arxiv}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{booktabs} % for professional tables
+\usepackage{hyperref}
+\usepackage{bbm}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{makecell}
+\usepackage{listings}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{caption}   % Required for \captionsetup
+
+\usepackage{adjustbox} % For table resizing if needed
+
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2025} with \usepackage[nohyperref]{icml2025} above.
+
+% Attempt to make hyperref and algorithmic work together better:
+% \newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+
+\usepackage{enumitem}
+
+% For theorems and such
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{pifont}
+\newcommand{\xmark}{\ding{55}}%
+
+% if you use cleveref..
+% \usepackage[capitalize,noabbrev]{cleveref}
+
+% Custom commands
+\newcommand{\cmnt}[2]{\textcolor{blue}{[\textbf{#1}: #2]}}
+\newcommand{\sa}[2]{\textcolor{blue}{[\textbf{#1}: #2]}}
+\newcommand{\alex}[1]{{\color{brown} Alex: #1}}
+\newcommand{\anne}[1]{{\color{pink} Anne: #1}}
+
+\newcommand{\fast}[1]{$\text{fast}_{#1}$}
+
+% code styling
+\lstset{ % Set default formatting for code listings
+  basicstyle=\ttfamily, % Use monospaced font (typewriter)
+  breaklines=true, % Automatically break long lines
+  % showstringspaces=false, % Do not show spaces in strings
+}
+
+\lstdefinelanguage{CUDACPP}{
+  language=C++,
+  morekeywords={__global__, __host__, __device__, __shared__, blockIdx, blockDim, threadIdx, gridDim},
+  morecomment=[l][\color{magenta}]{\#},
+}
+\lstset{
+  language=CUDACPP,
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  numbers=left,
+  numberstyle=\footnotesize\color{gray},
+  backgroundcolor=\color{lightgray!30},
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{blue},
+  emphstyle=\color{magenta},
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  captionpos=b,
+  frame=single,
+  escapeinside={\%*}{*)},
+  morekeywords={
+    kernel, global, __syncthreads, atomicAdd, cudaMalloc, cudaFree, 
+    cudaMemcpy, cudaMemcpyHostToDevice, cudaMemcpyDeviceToHost
+  },
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{proposition}[theorem]{Proposition}
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{corollary}[theorem]{Corollary}
+% \theoremstyle{definition}
+% \newtheorem{definition}[theorem]{Definition}
+% \newtheorem{assumption}[theorem]{Assumption}
+% \theoremstyle{remark}
+% \newtheorem{remark}[theorem]{Remark}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\iftoggle{arxiv}{
+    \usepackage[numbers,sort]{natbib}
+    \setlength{\textwidth}{6.5in}
+    \setlength{\textheight}{9in}
+    \setlength{\oddsidemargin}{0in}
+    \setlength{\evensidemargin}{0in}
+    \setlength{\topmargin}{-0.5in}
+    \newlength{\defbaselineskip}
+    \setlength{\defbaselineskip}{\baselineskip}
+    \setlength{\marginparwidth}{0.8in}
+}
+
+\newcolumntype{Y}{>{\hsize=.7\hsize}X}
+\newcolumntype{Z}{>{\hsize=1.3\hsize}X}
+
+\makeatletter
+\def\@copyrightspace{\relax}
+\makeatother
+
+\makeatletter
+\def\@myauthornotes{}
+\def\myauthornote#1{%
+  \if@ACM@anonymous\else
+    \g@addto@macro\addresses{}%
+    \g@addto@macro\@myauthornotes{%
+      \stepcounter{footnote}\footnotetext{#1}}%
+  \fi}
+\makeatother
+
+\iftoggle{arxiv}{
+    \renewcommand{\thefootnote}{}  % Remove footnote number
+    \title{
+        KernelBench: Can LLMs Write Efficient GPU Kernels?
+        \footnotetext{*Equal Contribution. Correspondence: \texttt{aco@stanford.edu, simonguo@stanford.edu}}
+    }
+    \usepackage{authblk}
+    \author[1,*]{Anne Ouyang}
+    \author[1,*]{Simon Guo}
+    \author[1]{Simran Arora}
+    \author[2]{Alex L. Zhang}
+    \author[1]{William Hu}
+    \author[1]{Christopher Ré}
+    \author[1]{Azalia Mirhoseini}
+    
+    \affil[1]{Stanford University}
+    \affil[2]{Princeton University}\vspace{4pt}
+}
+
+% \title{KernelBench: Can LLMs Write Efficient GPU Kernels?}
+
+\begin{document}
+
+\maketitle
+% List of affiliations: The first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% You can specify symbols, otherwise they are numbered in order.
+% Ideally, you should not use this facility. Affiliations will be numbered
+% in order of appearance and this is the preferred way.
+% \icmlsetsymbol{equal}{*}
+
+% \begin{icmlauthorlist}
+% \icmlauthor{Anne Ouyang}{equal,stanford}
+% \icmlauthor{Simon Guo}{equal,stanford}
+% \icmlauthor{Simran Arora}{stanford}
+% \icmlauthor{Alex Zhang}{princeton}
+% \icmlauthor{William Hu}{stanford}
+% \icmlauthor{Christopher Ré}{stanford}
+% \icmlauthor{Azalia Mirhoseini}{stanford}
+% \end{icmlauthorlist}
+
+% \icmlaffiliation{stanford}{Department of Computer Science, Stanford University, Stanford, California, USA}
+% \icmlaffiliation{princeton}{Department of Computer Science, Princeton University, Princeton, New Jersey, USA}
+
+% \icmlcorrespondingauthor{Anne Ouyang}{aco@stanford.edu}
+% \icmlcorrespondingauthor{Simon Guo}{simonguo@stanford.edu}
+% \vskip 0.3in
+
+%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+% \printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\begin{abstract}
+% Keep your abstract brief and self-contained, one paragraph and roughly 4--6 sentences.
+Efficient GPU kernels are crucial for building performant machine learning architectures, but writing them is a time-consuming challenge that requires significant expertise; therefore, we explore using language models (LMs) to automate kernel generation. We introduce \textbf{KernelBench}, an open-source framework for evaluating LMs' ability to write fast and correct kernels on a suite of 250 carefully selected PyTorch ML workloads. KernelBench represents a real-world engineering environment and making progress on the introduced benchmark directly translates to faster practical kernels. We introduce a new evaluation metric \fast{p}, which measures the percentage of generated kernels that are functionally correct and offer a speedup greater than an adjustable threshold $p$ over baseline. Our experiments across various state-of-the-art models and test-time methods show that frontier reasoning models perform the best out of the box but still fall short overall, matching the PyTorch baseline in less than 20\% of the cases. While we show that results can improve by leveraging execution and profiling feedback during iterative refinement, KernelBench remains a challenging benchmark, with its difficulty increasing as we raise speedup threshold $p$.
+
+
+
+%the previous version
+%Efficient GPU kernels are crucial for building performant machine learning architectures, but writing them is a time-consuming challenge that requires significant expertise; therefore, we explore using language models (LMs) to automate kernel generation. We introduce \textbf{KernelBench}, a novel framework with a benchmark consisting of 250 diverse PyTorch ML workloads representative of a real-world kernel engineering environment. KernelBench targets the specialized domain of kernel generation requiring code to be both correct and fast, and making progress on this benchmark directly translates to faster kernels applicable in the real world. We introduce a new evaluation metric \fast{p}, which measures the percentage of generated kernels that are functionally correct and offer a speedup greater than an adjustable threshold $p$ over baseline. Our experiments across various state-of-the-art models and test-time methods show that frontier reasoning models perform the best out of the box but still fall short overall, matching the PyTorch baseline in less than 20\% of the cases. While we show that results can improve by leveraging execution and profiling feedback in multi-turn interactions, KernelBench remains a challenging benchmark as there is still a large headroom for improvement, especially as we increase our target threshold $p$.  
+
+
+%however, there remains room for improvement, especially as we increase the threshold $p$ in our evaluation metric. 
+
+% We propose fully automated programmatic evaluation methods
+\end{abstract}
+
+\label{submission}
+
+\section{Introduction}
+\input{sections/sec01-introduction}
+
+\vspace{-2mm}
+\section{Related Works}
+\input{sections/sec02-backgrounds}
+
+\vspace{-2mm}
+\section{KernelBench: A Framework for AI Kernel Generation}
+\input{sections/sec03-benchmark}
+
+\vspace{-2mm}
+\section{KernelBench Baseline Evaluation}
+\input{sections/sec04-baseline}
+
+\vspace{-2mm}
+\section{Analysis of Model Capabilities}
+\input{sections/sec05-results}
+
+\vspace{-2mm}
+\section{Discussion}
+\input{sections/sec06-discussion}
+
+\section*{Acknowledgements}
+We are grateful to Google DeepMind, Google, IBM, Stanford HAI, PrimeIntellect, and Modal for supporting this work. We thank Aaryan Singhal, AJ Root, Allen Nie, Anjiang Wei, Benjamin Spector, Bilal Khan, Bradley Brown, Dylan Patel, Genghan Zhang, Hieu Pham, Hugh Leather, John Yang, Jon Saad-Falcon, Jordan Juravsky, Marcel Rød, Mark Saroufim, Michael Zhang, Minkai Xu, Ryan Ehrlich, Sahan Paliskara, Sahil Jain, Shicheng (George) Liu, Simran Arora, Suhas Kotha, Vikram Sharma Mailthody, and Yangjun Ruan for insightful discussions and constructive feedback in shaping this work.
+
+% In the unusual situation where you want a paper to appear in the
+% references without citing it in the main text, use \nocite
+% \nocite{langley00}
+
+% TODO: AVOID SUPER LONG CITATION AUTHOR LISTS!
+\bibliography{kernelbench}
+\bibliographystyle{arxiv}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\appendix
+
+\onecolumn
+\section{KernelBench Task Example}
+\label{appendix:kernelbench-task-examples}
+\input{appendix/task-details}
+
+\section{Evaluation Methodology and Baselines}
+\label{appendix:eval-methods-and-baselines}
+\input{appendix/torch-baseline}
+
+\section{Experiment Prompting Details}
+\label{appendix:experiment-prompts}
+\input{appendix/task-prompt}
+
+\section{Kernels of Interest}
+\label{appendix:kernel-case-study}
+\input{appendix/kernel-case-study}
+
+\section{Iterative Refinement on Correctness}
+\label{appendix:test-time-experiment}
+\input{appendix/test-time}
+
+\section{Few Shot Experiment}
+\label{appendix:few-shot-study}
+\input{appendix/few-shot-study}
+
+\section{Cross-Hardware Case Study}
+\label{appendix:cross-hardware-study}
+\input{appendix/hw-case-study}
+
+\section{High-Throughput Evaluation System}
+\label{appendix/eval-system}
+\input{appendix/eval-system}
+
+% The $\mathtt{\backslash onecolumn}$ command above can be kept in place if you prefer a one-column appendix, or can be removed if you prefer a two-column appendix.  Apart from this possible change, the style (font size, spacing, margins, page numbering, etc.) should be kept the same as the main body.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+

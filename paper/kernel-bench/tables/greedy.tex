@@ -1,0 +1,23 @@
+% Greey baseline table
+\begin{table}[h]
+\centering
+\setlength{\tabcolsep}{2pt} % default is about 6pt
+\begin{tabular}{lccc|ccc}
+    \toprule
+    $\textbf{\fast{1}}$ over: & \multicolumn{3}{c}{PyTorch Eager} & \multicolumn{3}{c}{torch.compile} \\ 
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    KernelBench Level & 1 & 2 & 3 & 1 & 2 & 3 \\ 
+    \midrule
+    GPT-4o              & 4\%  & 5\%  & 0\%  & 18\% & 4\%  & \textbf{4\%} \\
+    OpenAI o1           & \underline{10}\% & \underline{24}\% & \textbf{12\%} & 28\% & \underline{19}\% & \textbf{4\%} \\
+    DeepSeek V3         & 6\%  & 4\%  & \underline{8}\%  & 20\% & 2\%  & \underline{2}\%  \\
+    DeepSeek R1         & \textbf{12\%} & \textbf{36\%} & 2\% & \textbf{38\%} & \textbf{37\%} & \underline{2}\%  \\
+    Claude 3.5 Sonnet   & \underline{10}\% & 7\%  & 2\%  & \underline{29}\% & 2\%  & \underline{2}\%  \\
+    Llama 3.1-70B Inst. & 3\%  & 0\%  & 0\%  & 11\% & 0\%  & 0\%  \\
+    Llama 3.1-405B Inst.& 3\%  & 0\%  & 2\%  & 16\% & 0\%  & 0\%  \\
+    \bottomrule
+\end{tabular}
+
+\caption{\textbf{KernelBench is a challenging benchmark for current LMs}. Here we present \fast{1}, i.e. the percentage of problems where the model-generated kernel is faster than the PyTorch Eager and \texttt{torch.compile} baseline (default config) on NVIDIA L40S. The \texttt{torch.compile} baseline runtime is sometimes slower than Torch Eager -- this is due to reproducible runtime overhead (\textit{not compile time}) that could be significant for small kernels in Level 1. We focus on PyTorch Eager for the rest of our analysis, but we elaborate on other baselines in Appendix~\ref{appendix:eval-methods-and-baselines}.}
+\label{table:greedy-baseline}
+\end{table}

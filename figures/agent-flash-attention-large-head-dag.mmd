@@ -1,0 +1,47 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"nodeSpacing":30,"rankSpacing":42,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M2–M20｜读取参考与备份病例<br/>全量 5 case，没有精简"]:::context
+    design["M31–M50｜生成 TileLang 设计<br/>修检查路径后 AST 通过"]:::action
+    mixed["M81–M117｜生成 Cube/Vector 方案<br/>初版 wrapper AST 通过"]:::action
+    paths["M118–M137｜评测入口调用失败<br/>调整环境变量与脚本路径"]:::fail
+    queue["M140–M211｜直接构建并修队列 API<br/>编译多次失败"]:::fail
+    fixpipe["M212–M257｜修 Fixpipe 后再编译<br/>仍失败；读取当前目标 API 实现"]:::fail
+    vector["M260–M262｜重写成纯 Vector<br/>逐元素点积与在线 softmax"]:::action
+    vectorfail["M264–M309｜修 SetValue、Exp、搬运<br/>多次编译失败后到 host 构建"]:::fail
+    hostfix["M310–M320｜调整 SOC 与头文件<br/>将 tiling 定义从 device 头拆出"]:::action
+    build["M322–M325｜重建并打包安装<br/>扩展库构建完成"]:::pass
+    adapter["M326–M342｜修验证调用和模型接口<br/>JSON 路径、初始化参数适配"]:::action
+    ubfail["M343–M344｜首次实际数值验证<br/>设备报 UB 地址越界"]:::fail
+    smaller["M345–M348｜按 head dim 缩小块<br/>8、16、32；重建并安装"]:::action
+    accuracy["M349–M350｜重新验证全部病例<br/>5/5 通过，MERE 与 MARE 为 0"]:::pass
+    perfstart["M356–M357｜启动性能测试<br/>后台任务 b1r4vnfuu"]:::action
+    running["M358–M363｜轮询日志及进程<br/>profiler 仍在运行，无完整报告"]:::unverified
+    stop["M364–M365｜主动 TaskStop<br/>工具确认停止性能进程"]:::action
+    restore["M366–M368｜恢复同一份 5 case<br/>未观察到恢复后的新验证调用"]:::unverified
+    claim["M371–M373｜写 trace 与最终总结<br/>精度可追溯，性能加速比未知"]:::unverified
+
+    reference --> design
+    design --> mixed
+    mixed --> paths
+    paths --> queue
+    queue --> fixpipe
+    fixpipe --> vector
+    vector --> vectorfail
+    vectorfail --> hostfix
+    hostfix --> build
+    build --> adapter
+    adapter --> ubfail
+    ubfail --> smaller
+    smaller --> accuracy
+    accuracy --> perfstart
+    perfstart --> running
+    running --> stop
+    stop --> restore
+    restore --> claim
+
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px;
+    classDef pass fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:2px;
+    classDef fail fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:2px;
+    classDef context fill:#F3F4F6,stroke:#6B7280,color:#1F2937,stroke-width:2px;
+    classDef unverified fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:2px;
+    linkStyle default stroke:#475569,stroke-width:2px;

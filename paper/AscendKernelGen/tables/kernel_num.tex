@@ -1,0 +1,32 @@
+\begin{table*}[ht]
+\centering
+\caption{Categorization of kernel tasks in NPUKernelBench.}
+\resizebox{1\linewidth}{!}{
+\begin{tabular}{clllll}
+\toprule
+\textbf{Level} & \textbf{Static-shape} & \textbf{Dynamic-shape} & \textbf{Categories} & \textbf{Representative} & \textbf{Tasks} \\
+\midrule
+\multirow{5}{*}{Level 1} &\multirow{5}{5.5cm}{Can linear data flow be mapped to fixed-size loops with deterministic memory access?}&\multirow{5}{5.5cm}{Can element-wise logic remain correct under runtime-determined tensor shapes?} & Comparison & Add, Equal & 3 \\
+&&&Condition & IsFinite, IsInf & 3 \\
+&&&Index & GatherV3, ScatterList & 2 \\
+&&&Math &AddCustom, Sqrt & 26 \\
+&&&TensorCreation &Arange, Eye &3 \\ \hline
+\multirow{9}{*}{Level 2} &\multirow{9}{5.5cm}{Can structured computation exploit fixed tiling and local data reuse?}& \multirow{9}{5.5cm}{Can kernels generalize correctly across varying input sizes?} & Activation & Gelu, MulSigmoid & 14 \\
+&&&Foreach & ForeachAbs, ForeachSqrt& 53\\
+&&&Linalg & Cos, Matmul &2 \\
+&&&Loss & CrossEntropyLoss, MseLoss & 4\\
+&&&Mask & Tril, Triu & 3\\
+&&&Norm & AddLayerNorm, RmsNorm &16\\
+&&&Optim &ApplyAdamWV2& 2\\
+&&&Reduce & MulSigmoidMulAddCustom & 4\\
+&&&TensorMove & ExpandV2, ReverseSequence & 5\\ \hline
+\multirow{4}{*}{Level 3} &\multirow{4}{6cm}{Can complex kernels with global dependencies and non-trivial execution logic be generated correctly?}& \multirow{4}{5.5cm}{Can kernels support dynamic shapes and control flow in complex execution scenarios?} & \multirow{2}{*}{GMM} & \multirow{2}{*}{Gemm, BasicMatmul} & \multirow{2}{*}{17} \\
+&&& \multirow{2}{*}{Sort} & \multirow{2}{*}{TopKV3} & \multirow{2}{*}{1} \\
+&&&&&\\
+&&&&&\\
+\midrule
+&&&Total & 16 & 158 \\
+\bottomrule
+\end{tabular}}
+\label{tab:kernels}
+\end{table*}

@@ -1,0 +1,216 @@
+{
+  "source": "ascendc-kernelgen-data/dataset/agent_dataset/train-00000.jsonl",
+  "source_sha256": "f9427c7cd478dc6f09cf35080c493a24e8070ca734f255bba0034faa30b3c669",
+  "source_repository_commit": "0607a29d231cde384c9dfdb8a39f54f91837c327",
+  "index_base": 0,
+  "samples": [
+    {
+      "index": 20,
+      "jsonl_line": 21,
+      "slug": "interleave-rope",
+      "file": "interleave-rope.json",
+      "sha256": "7629639b65142200f488323b2b09a29c5a015db1301338fca7c639c3580f41d5",
+      "messages": 184,
+      "tool_calls": 96,
+      "tools": {
+        "Bash": 29,
+        "Read": 33,
+        "Grep": 5,
+        "Glob": 8,
+        "Write": 13,
+        "Skill": 4,
+        "Edit": 4
+      },
+      "tool_sequence_sha256": "dd8f7ef56f2edb1d16d0b31bc4b4ec567b2510aeeb4ff2698f176063481aceaa"
+    },
+    {
+      "index": 40,
+      "jsonl_line": 41,
+      "slug": "moe-compute-expert-tokens",
+      "file": "moe-compute-expert-tokens.json",
+      "sha256": "47f3cf9c326083907799b2187018ff7acf4defb82e87e9842ec999aea6058897",
+      "messages": 184,
+      "tool_calls": 98,
+      "tools": {
+        "Read": 25,
+        "Bash": 31,
+        "TaskCreate": 8,
+        "Glob": 4,
+        "Write": 20,
+        "Skill": 4,
+        "Grep": 4,
+        "Edit": 2
+      },
+      "tool_sequence_sha256": "c7f39074374de98ade109cec22f8405530de932f5bf521462dc7462e19f636f5"
+    },
+    {
+      "index": 120,
+      "jsonl_line": 121,
+      "slug": "moe-gating-topk-softmax",
+      "file": "moe-gating-topk-softmax.json",
+      "sha256": "409996303a48e48dcf46291cdec170392df718e4c57a3eda1e27b021e8c04d49",
+      "messages": 216,
+      "tool_calls": 102,
+      "tools": {
+        "TaskCreate": 8,
+        "TaskUpdate": 16,
+        "Read": 23,
+        "Bash": 27,
+        "Glob": 3,
+        "Write": 14,
+        "Edit": 5,
+        "Grep": 4,
+        "Skill": 2
+      },
+      "tool_sequence_sha256": "06a93a26dddf0d5113dae0a720aee7bb50e4325af0094080f57df37dfdfc7b04"
+    },
+    {
+      "index": 320,
+      "jsonl_line": 321,
+      "slug": "quant-matmul",
+      "file": "quant-matmul.json",
+      "sha256": "62230bc0b26ac1ccb23eb19fac486c3d8af9cede303ba4d2f0002bad8b7b5613",
+      "messages": 542,
+      "tool_calls": 280,
+      "tools": {
+        "Read": 59,
+        "Bash": 103,
+        "Glob": 9,
+        "Write": 50,
+        "Edit": 55,
+        "TaskCreate": 1,
+        "TaskUpdate": 1,
+        "Skill": 2
+      },
+      "tool_sequence_sha256": "ccc1434592f9dff67a17ae612d4e328911d130e385300e394575f929992dceec"
+    },
+    {
+      "index": 420,
+      "jsonl_line": 421,
+      "slug": "scaled-masked-softmax-v2",
+      "file": "scaled-masked-softmax-v2.json",
+      "sha256": "752ed9bd97ef15e5f96fd9f1a06e56e4659267f4cd8fa17ecb8f8144e20cd3c6",
+      "messages": 248,
+      "tool_calls": 132,
+      "tools": {
+        "Read": 33,
+        "Bash": 28,
+        "TaskCreate": 8,
+        "TaskUpdate": 14,
+        "Glob": 8,
+        "Write": 18,
+        "Edit": 22,
+        "Skill": 1
+      },
+      "tool_sequence_sha256": "db35ae83d795689ba6cad6548e866f1961adcc2b703cd0bb7db32ec570ea91bb"
+    },
+    {
+      "index": 480,
+      "jsonl_line": 481,
+      "slug": "flash-attention-large-head",
+      "file": "flash-attention-large-head.json",
+      "sha256": "242b33afee7cf1809f6e72b8122ed5d4aea2e46595b325cefc1970fe6dc571d0",
+      "messages": 374,
+      "tool_calls": 190,
+      "tools": {
+        "Read": 36,
+        "Bash": 48,
+        "Glob": 12,
+        "Write": 23,
+        "Edit": 41,
+        "Grep": 27,
+        "Skill": 2,
+        "TaskStop": 1
+      },
+      "tool_sequence_sha256": "57aa8c98f90e6d9f0fa42be3b11ed5c4b234d349512b68084934b9bd8921489e"
+    },
+    {
+      "index": 580,
+      "jsonl_line": 581,
+      "slug": "cos-math",
+      "file": "cos-math.json",
+      "sha256": "e2a84d772c0248223c3ded75fcfe603c2893b209f3253aafd5e2658c9ffddb87",
+      "messages": 250,
+      "tool_calls": 131,
+      "tools": {
+        "Read": 34,
+        "Bash": 61,
+        "Glob": 4,
+        "Skill": 4,
+        "Write": 18,
+        "Edit": 9,
+        "Grep": 1
+      },
+      "tool_sequence_sha256": "a627307a469fd2f3244008541b581620206fe2554ceca6f8859aac82bd83079c"
+    },
+    {
+      "index": 800,
+      "jsonl_line": 801,
+      "slug": "hans-decode",
+      "file": "hans-decode.json",
+      "sha256": "dce140f34673dc703fa97deff118eb35cadbc8d194ff80a931c88e5b22f85f90",
+      "messages": 336,
+      "tool_calls": 172,
+      "tools": {
+        "TaskCreate": 8,
+        "Read": 29,
+        "Bash": 71,
+        "TaskUpdate": 11,
+        "Grep": 5,
+        "Glob": 5,
+        "Write": 20,
+        "Edit": 22,
+        "Skill": 1
+      },
+      "tool_sequence_sha256": "7419f03e90a3cef4c0185c92153709350abc10ddb549719052f9aa5ca635db85"
+    },
+    {
+      "index": 840,
+      "jsonl_line": 841,
+      "slug": "histogram-v2",
+      "file": "histogram-v2.json",
+      "sha256": "61d118a3cebae1257c80ae102c3865ace06b4e17016952452ccbf9922eb793df",
+      "messages": 168,
+      "tool_calls": 85,
+      "tools": {
+        "Read": 31,
+        "Bash": 28,
+        "Glob": 8,
+        "Write": 14,
+        "Grep": 1,
+        "Edit": 3
+      },
+      "tool_sequence_sha256": "ffbdd87bebb325dc76a43bf84a2810fd6b95338173c4f3bc83647e92a83e69b0"
+    },
+    {
+      "index": 860,
+      "jsonl_line": 861,
+      "slug": "add-custom",
+      "file": "add-custom.json",
+      "sha256": "0237aae1d3ac0e17150ecbd5c0d9f6aab417f81d4779d3112b882766c1e5d4d3",
+      "messages": 148,
+      "tool_calls": 79,
+      "tools": {
+        "TaskCreate": 8,
+        "TaskUpdate": 16,
+        "Read": 22,
+        "Bash": 18,
+        "Glob": 3,
+        "Write": 9,
+        "Grep": 1,
+        "Edit": 1,
+        "Skill": 1
+      },
+      "tool_sequence_sha256": "9e2f1e46776c3c830bfb551940b02c92c5b658640091ddb07dcd8e03275cb956"
+    }
+  ],
+  "selection": "Ten distinct operators with full developer traces; one representative from each ordered-tool-call-ID group; excludes previously studied GroupedMatmulSliceM.",
+  "source_records": 1000,
+  "source_tool_id_groups": 100,
+  "source_group_size_counts": {
+    "10": 100
+  },
+  "selected_messages": 2650,
+  "selected_tool_calls": 1365,
+  "selection_note": "Identical tool-call-ID sequences identify shared interaction skeletons, not byte-identical records or proof of the augmentation mechanism."
+}

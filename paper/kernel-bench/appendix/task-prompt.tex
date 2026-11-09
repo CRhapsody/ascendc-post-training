@@ -1,0 +1,218 @@
+We provide details for the prompting strategies and associated sampling strategies used in Section~\ref{sec-4:baseline} and Section~\ref{sec-5:analysis}. 
+
+\subsection{One-shot Baseline Prompt}\label{appendix:one-shot-baseline-prompts}
+For the one-shot baseline as shown in Section~\ref{4.1}, we want to examine each model's out-of-the-box ability to generate kernels by providing the minimum set of information while ensuring the instructions and output format are clear. We query each model with the following prompt and a pair of in-context \texttt{add} examples (the PyTorch reference \texttt{add} and its CUDA kernel counterpart using inline compilation) to provide the output format. We sample the model with greedy decoding to ensure deterministic output, which is setting $\text{temperature}=0$.  
+
+\begin{lstlisting}
+You write custom CUDA kernels to replace the pytorch operators in the given architecture 
+to get speedups. 
+
+You have complete freedom to choose the set of operators you want to replace. You may
+make the decision to replace some operators with custom CUDA kernels and leave others
+unchanged. You may replace multiple operators with custom implementations, consider
+operator fusion opportunities (combining multiple operators into a single kernel, for
+example, combining matmul+relu), or algorithmic changes (such as online softmax). You are
+only limited by your imagination.
+
+Here\'s an example to show you the syntax of inline embedding custom CUDA operators in 
+torch: The example given architecture is:
+```
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Model(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def forward(self, a, b):
+        return a + b
+
+
+def get_inputs():
+    # randomly generate input tensors based on the model architecture
+    a = torch.randn(1, 128).cuda()
+    b = torch.randn(1, 128).cuda()
+    return [a, b]
+
+
+def get_init_inputs():
+    # randomly generate tensors required for initialization based on the model architecture
+    return []
+```
+
+The example new arch with custom CUDA kernels looks like this: 
+```
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.cpp_extension import load_inline
+
+# Define the custom CUDA kernel for element-wise addition
+elementwise_add_source = """
+#include <torch/extension.h>
+#include <cuda_runtime.h>
+
+__global__ void elementwise_add_kernel(const float* a, const float* b, float* out, int size) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < size) {
+        out[idx] = a[idx] + b[idx];
+    }
+}
+
+torch::Tensor elementwise_add_cuda(torch::Tensor a, torch::Tensor b) {
+    auto size = a.numel();
+    auto out = torch::zeros_like(a);
+
+    const int block_size = 256;
+    const int num_blocks = (size + block_size - 1) / block_size;
+
+    elementwise_add_kernel<<<num_blocks, block_size>>>(a.data_ptr<float>(), b.data_ptr<float>(), out.data_ptr<float>(), size);
+
+    return out;
+}
+"""
+
+elementwise_add_cpp_source = "torch::Tensor elementwise_add_cuda(torch::Tensor a, torch::Tensor b);"
+
+# Compile the inline CUDA code for element-wise addition
+elementwise_add = load_inline(
+    name='elementwise_add',
+    cpp_sources=elementwise_add_cpp_source,
+    cuda_sources=elementwise_add_source,
+    functions=['elementwise_add_cuda'],
+    verbose=True,
+    extra_cflags=[''],
+    extra_ldflags=['']
+)
+
+class ModelNew(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.elementwise_add = elementwise_add
+
+    def forward(self, a, b):
+        return self.elementwise_add.elementwise_add_cuda(a, b)
+```
+
+You are given the following architecture: 
+
+<PyTorch reference architecture for specific KernelBench Problem>
+
+Optimize the architecture named Model with custom CUDA operators! Name your optimized
+output architecture ModelNew. Output the new code in codeblocks. Please generate real
+code, NOT pseudocode, make sure the code compiles and is fully functional. Just output
+the new model code, no other text, and NO testing code! 
+\end{lstlisting}
+
+
+\subsection{Repeated Sampling Prompts}\label{appendix:multi-sampling-baseline-prompts}
+For repeated sampling, we use the same prompt that we used for the one-shot baseline in Appendix~\ref{appendix:one-shot-baseline-prompts}. We used the same sampling temperature described in \cite{brown2024largelanguagemonkeysscaling} as they allow sample diversity while ensuring quality. Specifically we use $\text{temperature}=1.6$ for Deepseek-V3 and  $\text{temperature}=0.7$ for Llama 3.1-70B.
+
+\subsection{Iterative Refinement Prompts}\label{appendix:multi-turn-baseline-prompts}
+For iterative refinement, we start with the same initial prompt that we used for the one-shot baseline in Appendix~\ref{appendix:one-shot-baseline-prompts}. A limitation of our experiments is that we sample with temperature$=0$ to focus on the effect of iterating based on feedback rather than introducing variability. On subsequent generations, we prompt the model with the following template depending on the feedback it expects:
+\begin{lstlisting}
+<Initial prompt from one-shot baseline for specific KernelBench problem.>
+
+Here is your latest generation:
+<Previously generated kernel G>
+
+Your generated architecture ModelNew and kernel was evaluated on GPU and checked against the reference architecture Model.
+Here is your Evaluation Result:
+
+<Raw Compiler and Execution Feedback from stdout>
+
+<'if correct:'>
+Your kernel executed successfully and produced the correct output.
+Here is your wall clock time: {runtime} milliseconds 
+
+<Profiler information if used and correct.>
+
+Name your new improved output architecture ModelNew. Output the new code in codeblocks. Please generate real code, NOT pseudocode, make sure the code compiles and is fully functional. Just output the new model code, no other text, and NO testing code!
+\end{lstlisting}
+
+\noindent For the compiler and execution feedback, we handle timeouts and deadlocks explicitly with "Your kernel execution timed out", but do not provide any other information.
+
+\subsection{Few-Shot in Context Prompts} \label{appendix:few-shot-study-prompts}
+For Few-Shot experiments as outlined in Section \ref{subsection:few-shot}. We provide more details about the in-context example in Appendix \ref{appendix:few-shot-study}. We sampled these experiments with $\text{temperature}=0$.  
+\begin{lstlisting}
+<Initial Task prompt from one-shot baseline for Instruction>
+<Initial pair of Reference PyTorch and CUDA kernel equiavlent for example add kernel from one-shot baseline for Instruction>
+
+Example <i>
+Here is an example architecture
+<PyTorch reference architecture for No. i in-context example>
+
+Here is an optimized verison with custom CUDA kernels: 
+<PyTorch architecture with Custom CUDA Kernel for No. i in-context example>
+
+.. up to number of in-context sample times
+
+
+Task:
+Here is an example architecture:
+
+<PyTorch reference architecture for specific KernelBench Problem>
+
+Name your new improved output architecture ModelNew. Output the new code in codeblocks. Please generate real code, NOT pseudocode, make sure the code compiles and is fully functional. Just output the new model code, no other text, and NO testing code!
+\end{lstlisting}
+
+\subsection{Hardware Case Study Prompts} \label{appendix:hardware-case-study-prompts}
+
+Here we provide hardware information. This is used in Section \ref{section:perf-across-hardware} and elaborated more in \ref{appendix:cross-hardware-study}, sampled with $\text{temperature}=0$.  
+
+\begin{lstlisting}
+<Initial Task prompt from one-shot baseline for Instruction>
+<Initial pair of Reference PyTorch and CUDA kernel equiavlent for example add kernel from one-shot baseline for Instruction>
+
+Here is some information about the underlying hardware that you should keep in mind. 
+
+The GPU that will run the kernel is NVIDIA <GPU NAME>.
+
+- We have <x> GB GDDR6 with ECC of GPU Memory.
+- We have <x> GB/s of Memory Bandwidth.
+- We have <x> of RT Core Performance TFLOPS.
+- We have <x> of FP32 TFLOPS.
+- We have <x> of TF32 Tensor Core TFLOPS.
+- We have <x> of FP16 Tensor Core TFLOPS.
+- We have <x> of FP8 Tensor Core TFLOPS.
+- We have <x> of Peak INT8 Tensor TOPS.
+- We have <x> of Peak INT4 Tensor TOPS.
+- We have <x> 32-bit registers per SM of Register File Size.
+- We have <x> of Maximum number of registers per thread.
+- We have <x> of Maximum number of thread blocks per SM.
+- We have <x> KB of Shared memory capacity per SM.
+- We have <x> KB of Maximum shared memory per thread block.
+
+
+
+Here are some concepts about the GPU architecture that could be helpful: 
+
+- Thread: A thread is a single execution unit that can run a single instruction at a time.
+- Thread Block: A thread block is a group of threads that can cooperate with each other.
+- Shared Memory: Shared memory is a memory space that can be accessed by all threads in a thread block.
+- Register: A register is a small memory space that can be accessed by a single thread.
+- Memory Hierarchy: Memory hierarchy is a pyramid of memory types with different speeds and sizes.
+- Memory Bandwidth: Memory bandwidth is the rate at which data can be read from or stored into memory.
+- Cache: Cache is a small memory space that stores frequently accessed data.
+- HBM: HBM is a high-bandwidth memory technology that uses 3D-stacked DRAM.
+
+Here are some best practices for writing CUDA kernels on GPU
+
+- Find ways to parallelize sequential code.
+- Minimize data transfers between the host and the device.
+- Adjust kernel launch configuration to maximize device utilization.
+- Ensure that global memory accesses are coalesced.
+- Minimize redundant accesses to global memory whenever possible.
+- Avoid long sequences of diverged execution by threads within the same warp.
+  #We added this to reference the specific GPU architecture
+- Use specialized instructions based on the specific GPU architecture
+
+You are given the following architecture: 
+
+<PyTorch reference architecture for specific KernelBench Problem>
+
+Name your new improved output architecture ModelNew. Output the new code in codeblocks. Please generate real code, NOT pseudocode, make sure the code compiles and is fully functional. Just output the new model code, no other text, and NO testing code!
+\end{lstlisting}
+

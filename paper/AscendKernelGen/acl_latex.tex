@@ -1,0 +1,321 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[final]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+ \usepackage{multirow} 
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{inconsolata}
+\usepackage{makecell}
+
+% 定义代码样式
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{24, 24, 245}
+\definecolor{backcolour}{rgb}{255, 255, 255}
+
+\definecolor{taskblue}{RGB}{0,99,177}
+\definecolor{refgreen}{RGB}{0,150,85}
+\definecolor{reforange}{RGB}{241, 157, 56}
+\definecolor{refpurple}{RGB}{159, 77, 182}
+\definecolor{refblue}{RGB}{77, 161, 255}
+
+\definecolor{subviolet}{RGB}{131,76,190}
+\definecolor{templateblue}{RGB}{1, 128, 134}
+\definecolor{refgreenDark}{RGB}{0, 90, 45}
+\definecolor{analysisblue}{HTML}{1E90FF} % Dodger Blue for Analysis boxes
+\definecolor{algoyellow}{HTML}{A0522D}   % Brown for Algorithm Description 
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\scriptsize\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{black},
+    numbers=none  % ← 关闭行号显示
+}
+
+% Python listing style
+\lstdefinestyle{codestyle}{
+  language=Python,
+  basicstyle=\footnotesize\ttfamily,
+  frame=single,
+  numbers=left,
+  numberstyle=\scriptsize,
+  xleftmargin=1.5em,
+  framexleftmargin=1.5em,
+  keywordstyle=\color{taskblue},
+  commentstyle=\itshape\color{gray},
+  stringstyle=\color{orange},
+  showstringspaces=false,
+  breaklines=true,
+  tabsize=2
+}
+
+\lstset{
+style=mystyle,
+  language=C++,
+  showstringspaces=false,
+  escapeinside={(*@}{@*)},
+  literate={\"}{{{}"}}1,
+  numbers=none  % ← 关闭行号显示
+}
+
+
+
+\definecolor{vscode-bg}{RGB}{248,248,248}
+\definecolor{vscode-border}{RGB}{220,220,220}
+\definecolor{vscode-keyword}{RGB}{0,122,204}
+\definecolor{vscode-inline}{RGB}{230,150,50}
+\definecolor{vscode-list}{RGB}{150,150,150}
+\definecolor{vscode-quote}{RGB}{120,120,120}
+\definecolor{vscode-text}{RGB}{40,40,40}
+
+\lstdefinelanguage{Markdown}{
+  morecomment=[l][\bfseries\color{vscode-keyword}]{\#},  % 以 # 开头的行
+}
+
+\lstdefinestyle{mdstyle}{
+  language=Markdown,
+  basicstyle=\ttfamily\scriptsize\color{vscode-text},
+  backgroundcolor=\color{vscode-bg},
+  frame=single,
+  rulecolor=\color{vscode-border},
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+  breakindent=0pt,        % 关键：换行缩进为0
+  % breakatwhitespace=false, % 关键：不在空格处断行
+  % postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}, % 可选：显示换行箭头
+  aboveskip=6pt,
+  belowskip=6pt,
+  xleftmargin=0pt,
+  xrightmargin=0pt,
+  framexleftmargin=0pt,
+  framexrightmargin=0pt,
+  literate=
+    {>}{{\textcolor{vscode-quote}{>}}}1
+    {-}{{\textcolor{vscode-list}{-}}}1
+    {`}{{\textcolor{vscode-inline}{`}}}1
+}
+
+
+
+\usepackage{array}          % For advanced table formatting
+\usepackage{tabularx}       % For flexible column widths
+%%%\usepackage{colortbl}       % For colored table cells and rows
+%%%%\usepackage{xcolor}         % For color definitions and text coloring
+\usepackage{verbatim}       % For verbatim text blocks
+\usepackage{fancyvrb}       % Enhanced verbatim (optional, for better code formatting)
+\usepackage{listings}       % Alternative for code formatting (optional)
+\usepackage{enumitem}       % For customizing itemize/enumerate lists
+\usepackage{amsmath}        % For mathematical formulas
+\usepackage{geometry}       % For page layout adjustments (optional)
+
+% Optional packages for better appearance
+\usepackage{booktabs}       % For professional table rules
+\usepackage{float}          % For better table positioning
+\usepackage{caption}        % For better caption formatting
+
+\usepackage{soul}
+\usepackage{xcolor}
+\usepackage{colortbl}    % 表格行/列着色（\rowcolor）
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[most]{tcolorbox}
+\usepackage{comment}
+\definecolor{bggreen}{RGB}{237, 237, 237}
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{gray!5},
+    stringstyle=\color{red},
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black}\itshape,
+    morekeywords={true, false, null}
+}
+%\title{AscendKernelGen: LLM-Driven Kernel Generation for NPUs}
+
+\title{
+\Large\textbf{AscendKernelGen: A Systematic Study of LLM-Based Kernel Generation for Neural Processing Units}\\[0.6ex]
+\small\textit{System Design, Data Construction, Fine-Tuning, and Comprehensive Evaluation}
+}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+% \author{First Author \\
+%   Affiliation / Address line 1 \\
+%   Affiliation / Address line 2 \\
+%   Affiliation / Address line 3 \\
+%   \texttt{email@domain} \\\And
+%   Second Author \\
+%   Affiliation / Address line 1 \\
+%   Affiliation / Address line 2 \\
+%   Affiliation / Address line 3 \\
+%   \texttt{email@domain} \\}
+
+% \author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+% \\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+% \\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+% \\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+% \\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+% \\
+% \\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+% \\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+% }
+
+\author{
+ \textbf{Xinzi Cao\textsuperscript{1,3}\thanks{Co-first author}},
+ \textbf{Jianyang Zhai\textsuperscript{1,3}\footnotemark[1]},
+ \textbf{Pengfei Li\textsuperscript{2}\footnotemark[1]},
+ \textbf{Zhiheng Hu\textsuperscript{2}\footnotemark[1]},
+ \textbf{Cen Yan\textsuperscript{2}},
+ \\
+ \textbf{Bingxu Mu\textsuperscript{2}},
+ \textbf{Guanghuan Fang\textsuperscript{2}},
+ \textbf{Bin She\textsuperscript{2}},
+ \textbf{Jiayu Li\textsuperscript{2}},
+ \textbf{Yihan Su\textsuperscript{2}}, 
+ \textbf{Dongyang Tao\textsuperscript{2}},
+ \\
+ \textbf{Xiansong Huang\textsuperscript{1}},
+ \textbf{Fan Xu\textsuperscript{1}},
+ \textbf{Feidiao Yang\textsuperscript{1}},
+ \textbf{Yao Lu\textsuperscript{1}},
+ \textbf{Chang-Dong Wang\textsuperscript{3}},
+ \textbf{Yutong Lu\textsuperscript{3}},
+\\
+ \textbf{Weicheng Xue\textsuperscript{1}\thanks{Corresponding author}},
+ \textbf{Bin Zhou\textsuperscript{1}\footnotemark[2]},
+ \textbf{Yonghong Tian\textsuperscript{1,4}\footnotemark[2]}
+\\
+\\
+ \textsuperscript{1}Pengcheng Laboratory,
+ \textsuperscript{2}Huawei,
+ \textsuperscript{3}Sun Yat-sen University,
+ \textsuperscript{4}Peking University
+\\
+ \small{
+   \textbf{Correspondence:} \href{mailto:xuewch@pcl.ac.cn}{xuewch@pcl.ac.cn}, 
+   \href{mailto:senosy@gmail.com}{senosy@gmail.com},
+   \href{mailto:yhtian@pku.edu.cn}{yhtian@pku.edu.cn}
+ }
+}
+\begin{document}
+\maketitle
+\begin{abstract}
+To meet the ever-increasing demand for computational efficiency, Neural Processing Units (NPUs) have become critical in modern AI infrastructure. However, unlocking their full potential requires developing high-performance compute kernels using vendor-specific Domain-Specific Languages (DSLs), a task that demands deep hardware expertise and is labor-intensive. While Large Language Models (LLMs) have shown promise in general code generation, they struggle with the strict constraints and scarcity of training data in the NPU domain. Our preliminary study reveals that state-of-the-art general-purpose LLMs fail to generate functional complex kernels for Ascend NPUs, yielding a near-zero success rate. To address these challenges, we propose AscendKernelGen, a generation-evaluation integrated framework for NPU kernel development. We introduce Ascend-CoT, a high-quality dataset incorporating chain-of-thought reasoning derived from real-world kernel implementations, and KernelGen-LM, a domain-adaptive model trained via supervised fine-tuning and reinforcement learning with execution feedback. Furthermore, we design NPUKernelBench, a comprehensive benchmark for assessing compilation, correctness, and performance across varying complexity levels. Experimental results demonstrate that our approach significantly bridges the gap between general LLMs and hardware-specific coding. Specifically, the compilation success rate on complex Level-2 kernels improves from 0\% to 95.5\% (Pass@10), while functional correctness achieves 64.3\% compared to the baseline's complete failure. These results highlight the critical role of domain-specific reasoning and rigorous evaluation in automating accelerator-aware code generation. AscendKernGen is available at \href{https://huggingface.co/AscendKernelGen}{\textcolor{blue}{AscendKernGen}} and \href{https://github.com/weich97/NPUKernelBench}{\textcolor{blue}{NPUKernelBench}}.
+\end{abstract}
+
+\input{secs/1_Introduction}
+\input{secs/2_RelatedWorks}
+\input{secs/3_Architecture}
+\input{secs/4_Overview}
+\input{secs/5_Datasets}
+\input{secs/6_Fine-turning}
+\input{secs/7_NPUKernelBench}
+\input{secs/8_Experiments}
+\input{secs/9_Conclusion}
+\clearpage
+\input{secs/Appendix}
+\bibliography{anthology}
+
+\end{document}

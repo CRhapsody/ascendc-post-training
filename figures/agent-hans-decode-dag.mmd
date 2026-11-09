@@ -1,0 +1,46 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"wrappingWidth":340}}}%%
+flowchart TB
+    hansContext["M5｜reference 为恒等占位<br/>直接返回原始 input_tensor"]:::context
+    hansDesign["M11–101｜4 例建工程与设计<br/>初版静态检查通过"]:::passed
+    hansCompileFail["M104–108｜首次构建<br/>DataCopyPad 类型不匹配"]:::failed
+    hansCompileRepair["M111–123｜修搬运及写出<br/>构建完成，初始化失败"]:::failed
+    hansMismatch1["M152–160｜补初始化接口<br/>4 个 case 全部不匹配"]:::failed
+    hansMismatch2["M164–170｜改成逆序解码<br/>重测仍全部不匹配"]:::failed
+    hansMismatch3["M171–177｜加载最终 buffer<br/>重测仍全部不匹配"]:::failed
+    hansCpuMove["M178–188｜改为 CPU host 解码<br/>设备 kernel 缩减为占位"]:::uncertain
+    hansLinkFail["M192–224｜共享库符号错误<br/>检查依赖并反复修链接"]:::failed
+    hansNoop["M225–235｜加入 no-op kernel 调用<br/>随后出现 host 内存错误"]:::failed
+    hansProbe["M236–247｜Python 编解码对照<br/>调查 buffer 与位流边界"]:::action
+    hansOriginalInput["M248–263｜host 读取原始输入<br/>模拟编码器求溢出信息"]:::uncertain
+    hansMeta["M264–270｜头部改为 256 个 uint16<br/>评测报 Byte / Half 类型错误"]:::failed
+    hansBytes["M271–295｜修 CPU 字节视图<br/>CPU 组装后传回设备"]:::action
+    hansPass["M297｜最终精度结果<br/>4 / 4 matched，MERE 与 MARE 为 0"]:::passed
+    hansPerfFail["M301–303｜首次性能命令退出 0<br/>报告却有两项初始化 ERROR"]:::failed
+    hansPerfRepair["M304–320｜改 reference 初始化接口<br/>重新运行性能脚本"]:::action
+    hansPerf["M322｜性能报告约 18.04 倍<br/>端到端解码加速未证实"]:::uncertain
+    hansFull["M323–328｜沿用原 4 例通过结果<br/>未新增全量重测"]:::context
+    hansSummary["M329–335｜读取精确值 18.038<br/>完成声明不证明独立 NPU 解码"]:::uncertain
+    hansContext --> hansDesign
+    hansDesign --> hansCompileFail
+    hansCompileFail --> hansCompileRepair
+    hansCompileRepair --> hansMismatch1
+    hansMismatch1 --> hansMismatch2
+    hansMismatch2 --> hansMismatch3
+    hansMismatch3 --> hansCpuMove
+    hansCpuMove --> hansLinkFail
+    hansLinkFail --> hansNoop
+    hansNoop --> hansProbe
+    hansProbe --> hansOriginalInput
+    hansOriginalInput --> hansMeta
+    hansMeta --> hansBytes
+    hansBytes --> hansPass
+    hansPass --> hansPerfFail
+    hansPerfFail --> hansPerfRepair
+    hansPerfRepair --> hansPerf
+    hansPerf --> hansFull
+    hansFull --> hansSummary
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:1.5px;
+    classDef passed fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.5px;
+    classDef failed fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.5px;
+    classDef context fill:#F1F5F9,stroke:#64748B,color:#0F172A,stroke-width:1.5px;
+    classDef uncertain fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:1.5px;

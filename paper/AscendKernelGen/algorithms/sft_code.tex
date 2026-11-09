@@ -1,0 +1,44 @@
+\begin{algorithm}[t]
+\caption{Pipeline for constructing precision-corrected SFT data}
+\label{alg:precision_sft_pipeline}
+
+\KwIn{Collection of test logs; repository of GT implementations}
+\KwOut{SFT dataset with reasoning and corrected kernels}
+
+% ---------- Step 1 ----------
+\textbf{Step 1: Identify Precision-Failure Samples} \\
+\Begin{
+  Traverse all log directories; \\
+  \ForEach{sample}{
+    \If{compilation succeeds \textbf{and} precision check fails}{
+      Extract its corresponding JSON metadata;
+    }
+  }
+}
+
+\vspace{1mm}
+
+% ---------- Step 2 ----------
+\textbf{Step 2: Generate Reconstruction-Based Training Data} \\
+\Begin{
+  \ForEach{extracted sample}{
+    Remove existing reasoning traces; \\
+    Load erroneous kernel code; \\
+    Retrieve corresponding GT kernel implementation; \\
+
+    Build an LLM prompt combining: \\
+    \Indp problem description, erroneous code, and GT reference; \Indm \\
+
+    Invoke LLM to: \\
+    \Indp
+      analyze root cause of precision failure; \\
+      discard faulty implementation; \\
+      reconstruct a correct kernel with new \texttt{<think>} and \texttt{<kernel\_impl>}; 
+    \Indm \\
+
+    Store the generated result as an SFT instance;
+  }
+  Perform resampling to satisfy the desired data quota per kernel;
+}
+
+\end{algorithm}

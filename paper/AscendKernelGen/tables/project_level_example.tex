@@ -1,0 +1,33 @@
+% \clearpage
+% !htbp
+\begin{table}[t]
+  \centering
+  % ============================= Outer container (single prompt)
+    \begin{tcolorbox}[
+    breakable,
+      sharp corners,
+      colframe=refpurple,
+      colback=refpurple!5,
+      colbacktitle=refpurple!15,
+      coltitle=refpurple,
+      boxrule=0.4pt,
+      title={Project-level CoT}, 
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+
+% 使用自定义样式
+\begin{lstlisting}[language=json]
+{
+ "input": "Prompt in Table 9.",
+ "output": "<think>\n My task is to implement an `AbsMath` operator for the Ascend processor. The operator's function is simple: take the absolute value of each element of the input tensor, i.e., `y = |x|`.\n\n First, let's analyze its characteristics. It is a typical element-wise operation with simple logic, no complex dependencies, and no matrix multiplication. Therefore, it is vector-intensive, meaning on the Ascend processor, I should mainly use the AI Vector (AIV) units rather than AI Cube (AIC) units.\n\nThe hardware model is `Ascend910_93` with `vector_core_cnt=48` Vector cores. Each core has a Unified Buffer (UB) of 196,352 bytes. UB size limits the amount of data that can be processed at once. The input is `shape=[1]`, `dtype=float16`. Though very small, the implementation (especially tiling) must handle arbitrary sizes. Based on this, the implementation is divided into Host-side Tiling logic and Device-side Kernel.\n\n**I. Host-side Tiling Strategy Design**\n\nThe core goal of Tiling is to decompose the entire computation task into small tiles so that it can be processed in parallel on multiple cores and ensure that each data block can be loaded into UB. \n\n1. **Data Type and Computation Selection**:\n The `AbsMath` operator needs to support multiple data types, each with different methods for calculating its absolute value. To differentiate these cases on the kernel side, I need to design a `tilingKey`. The host side sets this `tilingKey` based on the input data type, and the kernel side uses it to call the corresponding processing logic. * For `float16`, `bfloat16`, and `float32` types, the `Abs` instruction can be used directly, and I have assigned a `tilingKey` for this. * For `int32`, the absolute value needs to be efficiently obtained using the bitwise operation `(x ^ (x >> 31)) - (x >> 31)`, which corresponds to a separate `tilingKey`. * For `int64`, the bitwise operation `(x ^ (x >> 63)) - (x >> 63)` is also used, and a `tilingKey` is also assigned ...
+}
+\end{lstlisting}
+\end{tcolorbox}
+\captionof{table}{A project-level CoT example for Ascend kernel SFT, comprising a question and its CoT.}
+\label{tab:project_example}
+\end{table}
+

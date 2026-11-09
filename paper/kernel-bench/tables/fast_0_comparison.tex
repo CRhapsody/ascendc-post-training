@@ -1,0 +1,21 @@
+\begin{table*}[ht]
+\centering
+\setlength{\tabcolsep}{2pt} % Reduce column spacing
+{\small % Only the table content is affected
+\begin{tabular}{l|ccc|ccc|ccc}
+\toprule
+\multirow{3}{*}{\textbf{Method}} & \multicolumn{3}{c|}{\textbf{Level 1}} & \multicolumn{3}{c|}{\textbf{Level 2}} & \multicolumn{3}{c}{\textbf{Level 3}} \\
+ & \scriptsize{Llama-3.1} & \scriptsize{DeepSeek} & \scriptsize{Deepseek} & \scriptsize{Llama-3.1} &  \scriptsize{Deepseek} &  \scriptsize{Deepseek} &  \scriptsize{Llama-3.1} &  \scriptsize{Deepseek} &  \scriptsize{Deepseek} \\
+ & \small{70B} & \small{V3} & \small{R1} & \small{70B} & \small{V3} & \small{R1} & \small{70B} & \small{V3} & \small{R1} \\
+\midrule
+Single Attempt (Baseline) & 26\% & 43\% & 67\% & 0\% & 6\% & 62\% & 0\% & 30\% & 8\% \\
+\midrule
+Iterative Refinement (w G) & 27\% & 48\% & 72\% & 2\% & 7\% & 67\% & 0\% & 36\% & 14\% \\
+Iterative Refinement (w G+E) & \textbf{40\%} & \textbf{53\%} & 95\% & \textbf{7\%} & 8\% & 85\% & 18\% & 42\% & \textbf{50\%} \\
+Iterative Refinement (w G+E+P) & 36\% & 50\% & \textbf{95\%} & \textbf{7\%} & \textbf{9\%} & \textbf{92\%} & 8\% & \textbf{44\%} & 42\% \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Leveraging execution feedback helps reduce errors:} Here we present the percentage of problems where the LM-generated Kernel is correct for iterative refinement. We note leveraging execution feedback helps the model achieve better correctness \fast{0}, which is the percentage of problems where the model has at least one correct generation up to turn $N=10$. We note the various iterative refinement configurations, leveraging previous Generation $G$, Execution Result $E$, and Timing Profiles $P$.}
+\label{table:fast0-method-comparison}
+\end{table*}

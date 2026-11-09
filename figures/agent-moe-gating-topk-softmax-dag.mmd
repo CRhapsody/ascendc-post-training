@@ -1,0 +1,51 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569"},"flowchart":{"curve":"linear","nodeSpacing":28,"rankSpacing":30,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M20–29 读取参考并查 case<br/>配套 JSON 未找到"]
+    createCases["M30–51 初始化并自建 10 例<br/>含 2D、3D、4D，随后备份"]
+    design["M56–83 参考相关算子设计<br/>写 TileLang，修正源行号"]
+    exportFailure["M84–86 首次 AST 未执行<br/>Hook 把 export 当程序"]
+    envFailure["M87–89 改为环境变量前缀<br/>Hook 再次无法启动命令"]
+    tileAst["M90–93 去掉前缀重试<br/>TileLang AST 通过"]
+    code["M97–125 写 AscendC 工程<br/>多遍扫描，候选 AST 通过"]
+    initFailure["M126–132 构建后验证失败<br/>构造器收到多余参数"]
+    initFix["M133–144 核对验证器<br/>候选初始化参数改为 []"]
+    ndFailure["M145–151 重测失败<br/>参考多维索引不兼容"]
+    goldenEdit["M152–157 修改 model.py<br/>参考前向展平所有前导维"]
+    maskFailure["M158–159 再测失败<br/>finished 掩码无法 reshape"]
+    twoDimCases["M160–161 改写 case JSON<br/>10 例全部换成 2D"]
+    twoDimPass["M162–163 重测 通过<br/>修改参考后的 10 个 2D 例"]
+    perfFailure["M173–177 性能调用失败<br/>双方初始化参数不兼容"]
+    perfFix["M178–187 改参考初始化<br/>get_init_inputs 返回 []"]
+    performance["M188–193 性能报告 2.6538x<br/>含 profiler 失效后兜底计时"]
+    restore["M198–199 恢复 10 例备份<br/>再次出现 3D / 4D 输入"]
+    replaceAgain["M200–201 评测前再次改写<br/>又替换为同一批 2D 例"]
+    finalPass["M202–203 新验证 通过<br/>仍是替换后的 10 个 2D 例"]
+    reference --> createCases
+    createCases --> design
+    design --> exportFailure
+    exportFailure --> envFailure
+    envFailure --> tileAst
+    tileAst --> code
+    code --> initFailure
+    initFailure --> initFix
+    initFix --> ndFailure
+    ndFailure --> goldenEdit
+    goldenEdit --> maskFailure
+    maskFailure --> twoDimCases
+    twoDimCases --> twoDimPass
+    twoDimPass --> perfFailure
+    perfFailure --> perfFix
+    perfFix --> performance
+    performance --> restore
+    restore --> replaceAgain
+    replaceAgain --> finalPass
+    classDef action fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef pass fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    classDef fail fill:#fee2e2,stroke:#dc2626,color:#0f172a;
+    classDef context fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef limited fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    class createCases,design,code,initFix,goldenEdit,twoDimCases,perfFix,restore,replaceAgain action;
+    class tileAst,twoDimPass,finalPass pass;
+    class exportFailure,envFailure,initFailure,ndFailure,maskFailure,perfFailure fail;
+    class reference context;
+    class performance limited;

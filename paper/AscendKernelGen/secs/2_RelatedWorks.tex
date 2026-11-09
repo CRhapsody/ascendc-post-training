@@ -1,0 +1,93 @@
+\section{Related Works}
+\label{sec:relatedworks}
+
+Our work lies at the intersection of large-scale model–based code generation and hardware-specific kernel optimization. In this section, we review prior work from four perspectives: general-purpose code generation with LLMs, traditional hardware kernel optimization, LLM-based kernel generation, and benchmarking for code generation.
+
+\subsection{Large-Scale Models for General-Purpose Code Generation}
+
+Large Language Models (LLMs) have demonstrated remarkable progress in general-purpose code generation across mainstream programming languages such as Python, C++, and Java. Representative systems include OpenAI's Codex~\cite{chen2021evaluating}, AlphaCode~\cite{novikov2025alphaevolve}, Code Llama~\cite{roziere2023code}, Qwen2.5/3-Coder~\cite{hui2024qwen2}, and CodeRL~\cite{le2022coderl}, enabling applications such as code completion, refactoring, and competitive programming.
+
+Despite these advances, general-purpose LLMs remain limited when applied to domain-specific code generation tasks that involve specialized APIs and strict semantic constraints~\cite{gu2025effectiveness}. In particular, hardware-specific programming languages impose requirements that differ fundamentally from general-purpose software development, including explicit memory hierarchy management, architecture-dependent execution semantics, and performance-critical correctness constraints. When faced with such settings, LLMs often fail to generate compilable or semantically valid code, motivating the need for domain-adaptive data and training strategies.
+
+
+\subsection{Traditional Hardware-Specific Kernel Optimization}
+
+%Before the advent of LLMs, academia and industry primarily relied on traditional AI compilers and auto-tuning techniques to optimize kernels on specific hardware. These routes include:
+
+%\begin{itemize}
+%    \item Auto-Tuning: Techniques like TVM~\cite{chen2018tvm} and Ansor~\cite{zheng2020ansor} optimize performance through operator splitting, fusion, and scheduling combined with automated search.
+%    \item High-Level Abstractions \& Domain-Specific Languages: Halide~\cite{ragan2013halide} pioneered the decoupling of algorithm definition from execution scheduling, significantly simplifying the optimization of image processing pipelines across diverse architectures. Similarly, Triton~\cite{tillet2019triton} simplify GPU kernel development via a high-level, Python-like abstraction, while MLIR~\cite{lattner2020mlir} provides modular intermediate representation capabilities. TensorFlow XLA follows a similar compiler-based route, lowering high-level TensorFlow graphs into high-level optimizer intermediate representation and performing aggressive fusion and optimization before generating backend-specific code for platforms with different architecture~\cite{snider2023operator}. PyTorch 2.0 further extends this route through TorchDynamo and TorchInductor~\cite{ansel2024pytorch}, where the former captures Python-level computation graphs with minimal overhead and the latter compiles them into optimized GPU (Triton) or CPU (C++) kernels, achieving substantial real-world speedups across large model suites.
+%    \item \textbf{Polyhedral Compilation:} Approaches like Tensor Comprehensions~\cite{vasilache2018tensor} and Tiramisu~\cite{baghdadi2019tiramisu} utilize polyhedral intermediate representations to perform systematic loop transformations. AKG~\cite{zhao2021akg} specifically targets Neural Processing Units (NPUs) like Huawei Ascend. It leverages polyhedral schedulers to model the NPU's heterogeneous compute units (Cube/Vector) and automate the management of its complex memory hierarchy via integer linear programming.
+%    \item Search \& Equivalent Transformation: Frameworks like TASO~\cite{jia2019taso}, PET~\cite{wang2021pet}, and EINNET~\cite{zheng2023einnet} automatically explore efficient execution plans by formalizing operator specifications or transforming tensor algebra expressions.
+%    \item Platform-Specific Libraries: NVIDIA's CUTLASS~\cite{markidis2018nvidia}, for instance, provides a template library for tensor operations to generate optimized CUDA kernels. Similarly, Liger-Kernel~\cite{hsu2024liger} offers a set of Triton-based kernels that are explicitly optimized for both a specific hardware platform (GPUs) and a specific workload (LLM training), enabling substantial improvements in training throughput and memory efficiency over baseline implementations.
+%\end{itemize}
+
+
+%While these methods can achieve high performance, they are often constrained by a dependency on extensive expert knowledge (e.g., for template design), prohibitive search times (for Auto-Tuning), and limited generalization capabilities. These distinct approaches, spanning TVM's general-purpose tuning, the specialized abstractions of Triton/TASO/PET/EINNET, and dedicated libraries like CUTLASS, all fail to directly adapt to closed-structure, interface-specific architectures such as the Ascend NPU. This highlights a critical dilemma: general-purpose solutions (like TVM) lack the necessary adaptability for this target, while platform-specific solutions (like CUTLASS) incur high development costs and offer no performance portability. This motivates our LLM-based generation approach.
+
+Prior to the adoption of LLMs, kernel optimization for specialized hardware primarily relied on compiler-based and auto-tuning approaches. Auto-tuning frameworks such as TVM~\cite{chen2018tvm} and Ansor~\cite{zheng2020ansor} search over scheduling and optimization spaces to improve performance across diverse hardware backends. High-level abstractions and domain-specific languages, including Halide~\cite{ragan2013halide}, Triton~\cite{tillet2019triton}, and MLIR~\cite{lattner2020mlir}, decouple algorithm specification from execution scheduling, substantially lowering the barrier to kernel optimization on GPUs and other accelerators. Similarly, TensorFlow XLA~\cite{snider2023operator} and PyTorch 2.0~\cite{ansel2024pytorch} adopt compiler-based pipelines to transform high-level computation graphs into optimized backend-specific kernels.
+
+More specialized approaches leverage polyhedral compilation techniques to model and optimize loop transformations systematically. Representative systems include Tensor Comprehensions~\cite{vasilache2018tensor}, Tiramisu~\cite{baghdadi2019tiramisu}, and AKG~\cite{zhao2021akg}, the latter of which targets NPUs by modeling heterogeneous compute units and complex memory hierarchies. Other efforts explore operator-level search and algebraic transformation, such as TASO~\cite{jia2019taso}, PET~\cite{wang2021pet}, and EINNET~\cite{zheng2023einnet}. In addition, platform-specific libraries like CUTLASS~\cite{markidis2018nvidia} and Liger-Kernel~\cite{hsu2024liger} provide hand-optimized kernels for particular hardware–workload combinations.
+
+While these methods can achieve high performance, they typically require substantial expert knowledge, incur high search or development costs, and offer limited generalization across architectures. General-purpose compilers often lack the flexibility to adapt to closed or interface-constrained platforms, whereas platform-specific libraries sacrifice portability. These limitations motivate exploration of more flexible, learning-based kernel generation approaches.
+
+
+\subsection{LLM-based Generation for Hardware Kernels}
+
+\begin{comment}
+
+Recently, a series of pioneering works have begun exploring the use of LLMs to generate hardware code (rather than Python), showing significant potential. These efforts are primarily concentrated in the mature CUDA and TPU ecosystems:
+
+\begin{itemize}
+    \item \textbf{GPU Kernels:} Research in the GPU ecosystem exhibits a diverse methodological spectrum.
+    \begin{itemize}
+        \item \textbf{Direct generation via in-context learning (prompting):}
+        Ouyang et al.~\cite{ouyang2025kernelbench} proposed KernelBench to evaluate the ability of LLMs to generate CUDA kernels. CUDA-LLM~\cite{chen2025cuda} utilizes LLMs to automatically generate and optimize CUDA programs. Sakana.ai's AI CUDA Engineer~\cite{lange2025ai} proposes using intermediate representations to improve LLM understanding of low-level operators. 
+    
+        \item \textbf{Domain adaptation via supervised fine-tuning (SFT):}
+        Fisches et al.~\cite{kernelllm2025} proposed KernelLLM, a model trained specifically for generating Triton GPU kernels that achieves competitive performance despite its relatively small size.
+
+        \item \textbf{Optimization via reinforcement learning (RL):}
+        Baronio et al. proposed Kevin~\cite{baronio2025kevin}, the first model trained with a multi-turn GRPO~\cite{shao2024deepseekmath, guo2025deepseek} for CUDA kernel generation and optimization, which significantly improves correctness and performance by explicitly incorporating iterative refinement and leveraging execution feedback across turns. Li et al. introduced CUDA-L1~\cite{li2025cuda}, a pipelined system for CUDA optimization powered by a novel Contrastive Reinforcement Learning (Contrastive-RL) algorithm, achieving an industry-leading average speedup of $3.12\text{x}$ (median $1.42\text{x}$) over default baselines on KernelBench by autonomously discovering and strategically combining optimization techniques across different GPU architectures. Li et al. introduced AutoTriton~\cite{li2025autotriton}, the first RL-powered model for Triton programming, which sequentially leverages a specialized data pipeline for supervised fine-tuning and applies the GRPO algorithm with a combined rule-based and execution-based reward to achieve correctness and performance comparable to mainstream large LLMs. Woo et al. introduced TritonRL~\cite{woo2025tritonrl}, an 8B-scale Triton-specific LLM trained with a novel RL framework featuring a robust, fine-grained verifier (mitigating reward hacking) and a hierarchical reward decomposition for reasoning and code tokens, achieving state-of-the-art correctness and speedup among small Triton models. SparseRL~\cite{anonymous2025mastering} is a Deep Reinforcement Learning framework for sparse CUDA code generation (SpMV/SpMM) that utilizes a novel sinusoidal embedding of sparse matrix indices and a hierarchical reward function incorporating execution efficiency, achieving state-of-the-art performance with up to $30\%$ faster code execution compared to existing LLM methods.
+    
+        \item \textbf{Autonomous generation via agentic frameworks:}
+        Guo et al.~\cite{guo2025evoengineer} introduced EvoEngineer, the first systematic framework for LLM-based CUDA kernel code evolution that decomposes the process into two-layer traverse techniques and population management. Dong et al.~\cite{dong2025stark} introduced STARK, a novel multi-agent LLM framework for GPU kernel optimization that employs specialized agents for planning, coding, and debugging, coupled with a strategic search over a tree memory and grounded instructions to consistently achieve substantial runtime speedups (up to 16x) over conventional monolithic agents. Zhang et al. proposed CudaForge~\cite{zhang2025cudaforge}, a novel training-free multi-agent workflow (Coder and Judge) for CUDA kernel optimization that explicitly integrates Nsight Compute (NCU) hardware feedback to guide targeted, iterative refinement, achieving state-of-the-art correctness ($97.6\%$) and high speedup ($1.68\text{x}$) at a remarkably low API cost.
+
+        \item \textbf{Other techniques:}
+        Gong et al. proposed ReGraphT~\cite{gong2025large}, a training-free retrieval-augmented generation framework that transfers LLM-level CUDA optimization expertise to small language models by encoding optimization trajectories into a structured Reasoning Graph and leveraging Monte Carlo Graph Search for efficient, guided exploration, achieving significant speedups.
+    \end{itemize}
+    
+    \item \textbf{TPU Kernels:} Google DeepMind's AlphaEvolve~\cite{novikov2025alphaevolve} is a Gemini-based evolutionary coding agent capable of optimizing TPU arithmetic circuits and AI training kernels (like FlashAttention).
+    \item \textbf{HPC (High-Performance Computing):} Several US National Labs (ORNL, LLNL, ANL, etc.) are also developing LLM-driven HPC agents for performance analysis and parallel code generation~\cite{teranishi2025leveraging, ma2025connecting, nichols2024hpc, chaturvedi2025hpc}.
+\end{itemize}
+
+While these groundbreaking works demonstrate the feasibility of LLM-based hardware code generation, their focus on the mature CUDA and TPU ecosystems highlights two critical gaps that motivate our work. First, they do not address the unique architectural challenges and proprietary programming paradigm of the Ascend NPU platform. Second, they lack a public, systematic evaluation framework specifically designed to benchmark AscendC kernel generation. As a result, applying LLM-based automation frameworks to the emerging Ascend ecosystem remains a largely unexplored niche. This situation clearly demonstrates the necessity for both our generation model and evaluation framework.
+
+\end{comment}
+
+Inspired by the success of LLMs in general-purpose programming, recent work has begun to explore their application to hardware kernel generation, primarily within mature ecosystems such as CUDA GPUs and TPUs. Early efforts focus on direct kernel generation via prompting and in-context learning, as exemplified by CUDA-LLM~\cite{chen2025cuda} and AI CUDA Engineer~\cite{lange2025ai}. Subsequent work introduces domain adaptation through supervised fine-tuning, such as KernelLLM~\cite{kernelllm2025}, which demonstrates that compact, domain-specific models can generate competitive GPU kernels.
+
+More recent studies incorporate reinforcement learning and execution feedback to iteratively refine generated kernels. Systems such as Kevin~\cite{baronio2025kevin}, CUDA-L1~\cite{li2025cuda}, AutoTriton~\cite{li2025autotriton}, and TritonRL~\cite{woo2025tritonrl} show that combining supervised initialization with execution-guided optimization can significantly improve correctness and performance. In parallel, agentic and multi-agent frameworks have been proposed to automate kernel optimization through planning, debugging, and search, including EvoEngineer~\cite{guo2025evoengineer}, STARK~\cite{dong2025stark}, and CudaForge~\cite{zhang2025cudaforge}. Related efforts also explore retrieval-augmented and graph-based reasoning for kernel optimization~\cite{gong2025large}.
+
+Despite these advances, existing LLM-based kernel generation methods largely focus on open and well-documented platforms such as CUDA and TPU, benefiting from mature toolchains and abundant training data. In contrast, LLM-driven kernel generation for emerging NPU platforms with proprietary programming models remains underexplored.
+
+
+\subsection{Benchmarking for Code Generation}
+
+\begin{comment}
+
+The evaluation of LLM-generated code was standardized in the general-purpose domain by benchmarks such as \texttt{HumanEval}~\cite{chen2021evaluating} and \texttt{MBPP}~\cite{austin2021program}. However, these frameworks are fundamentally unsuitable for the NPU kernel domain. They primarily evaluate functional correctness on algorithmic tasks and do not measure the critical metrics essential to hardware programming, such as \textit{compilation success}, \textit{functional correctness} under hardware constraints, or \textit{performance} (e.g., latency, throughput).
+
+This gap led to the creation of the first hardware-specific benchmarks, most notably \texttt{KernelBench} (for CUDA) and \texttt{MultiKernelBench} (for multiple platforms, including AscendC). While these frameworks represent a significant step forward by introducing compilation and performance metrics, our analysis reveals that they possess a key architectural limitation: they tend to operate as single-path evaluation systems. For instance, existing frameworks typically support only one "Host+Device" evaluation paradigm. This requires the LLM to \textit{always} generate the complete Host-side and Device-side code, even for simple kernels. This "single-path" architecture lacks flexibility, forcing the model to generate a large amount of complex Host-Side boilerplate code for simple tasks (like L1 kernels), which adds unnecessary evaluation difficulty.
+
+In the area of automated GPU kernel development, TritonGym~\cite{anonymous2025tritongym} is an interactive, tool-centric benchmark and orchestration framework that standardizes access to evaluation tools via a function-call API, enabling fair comparison and systematic evaluation of agentic LLM workflows for Triton GPU kernel generation, especially for challenging out-of-distribution (OOD) tasks.
+
+To the best of our knowledge, there remains a critical need for a flexible evaluation framework that can appropriately assess LLMs on both simple "Kernel-Only" tasks and complex, "Host+Device" tasks, thereby providing a more comprehensive evaluation of both static shape optimization and dynamic shape robustness.
+
+\end{comment}
+
+Evaluation of LLM-generated code in general-purpose domains has been standardized by benchmarks such as HumanEval~\cite{chen2021evaluating} and MBPP~\cite{austin2021program}. However, these benchmarks focus primarily on functional correctness and are ill-suited for hardware kernel generation, where compilation success, hardware-constrained correctness, and performance metrics are equally critical.
+
+To address this gap, hardware-oriented benchmarks such as KernelBench~\cite{ouyang2025kernelbench} and MultiKernelBench~\cite{wen2025multikernelbench} extend evaluation to include compilation and performance. While these benchmarks represent an important step forward, they typically adopt a single-path evaluation paradigm that requires generation of complete host–device code for all tasks. This design introduces unnecessary complexity for simple kernels and limits flexibility in assessing different levels of kernel abstraction. More recent systems, such as TritonGym~\cite{anonymous2025tritongym}, provide interactive and tool-centric evaluation environments for GPU kernels.
+
+Overall, there remains a lack of a flexible, comprehensive evaluation framework tailored to NPU kernel generation that can jointly assess kernel-only optimization and full host–-device integration. Addressing this gap is essential for reliably measuring progress in LLM-based kernel generation for specialized hardware platforms.

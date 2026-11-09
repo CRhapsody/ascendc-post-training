@@ -1,0 +1,32 @@
+\begin{wraptable}{l}{0.5\textwidth}
+\vspace{-10pt}
+\centering
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=reforange,
+      colback=reforange!5,
+      colbacktitle=reforange!15,
+      coltitle=reforange,
+      boxrule=0.4pt,
+      title={\textbf{Instructions}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+{\small
+\begin{itemize}[leftmargin=*, itemsep=1pt, parsep=0pt, topsep=2pt]
+    \item \textbf{Role:} "You are a professional Ascend kernel development engineer."
+    \item \textbf{Target Language and API:} "Please use Ascend C for development."
+    \item \textbf{Code Style Requirements:} "Ensure high code readability and include necessary comments."
+    \item \textbf{Output Format Requirements:} "Generate separate Kernel and Host code: the Kernel defines <kernel\_name>\_kernel, and the Host declares Operator<OperatorName>Paras and implements the corresponding computation logic."
+    \item \textbf{Key Information Reminder:} "Pay attention to handling the tensor data types, shapes, and layouts properly."
+\end{itemize}
+}
+\end{tcolorbox}
+\vspace{-10pt}
+\captionof{table}{General instructions used in the prompt.}
+\label{tab:prompt_ins}
+\vspace{-10pt}
+\end{wraptable}

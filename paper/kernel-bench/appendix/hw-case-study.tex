@@ -1,0 +1,125 @@
+\subsection{Evaluation across different hardware}
+
+To evaluate how generated kernels fare across different hardware platforms, we utilize a number of different NVIDIA GPUs that span different micro-architectures and capabilities. The specific details for each is provided in Table \ref{tab:gpu_specifications}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lllllll}
+\hline
+
+\textbf{Provider} & \textbf{GPU Type} & \textbf{Memory} & \textbf{Power} & \textbf{Microarchitecture} & \textbf{FP16 TFLOPS} & \textbf{Memory Bandwidth}\\ 
+\hline
+
+Baremetal& NVIDIA L40S       & 48 GB           & 300W           & Ada      & 362.05 & 864 GB/s                 \\ 
+Baremetal& NVIDIA H100       & 80 GB           & 700W           & Hopper      & 989.5 & 3350 GB/s              \\ 
+Serverless& NVIDIA L40S       & 48 GB           & 350W           & Ada       & 362.05 & 864 GB/s                \\ 
+Serverless& NVIDIA A100       & 42 GB           & 400W           & Ampere    & 312 & 1935 GB/s                \\ 
+Serverless& NVIDIA L4         & 24 GB           & 72W            & Ada       & 121 & 300 GB/s                \\ 
+Serverless& NVIDIA T4         & 16 GB           & 70W            & Turing     & 65 & 300 GB/s               \\ 
+Serverless& NVIDIA A10G       & 24 GB           & 300W           & Ampere      & 125 & 600 GB/s              \\ 
+\hline
+
+\end{tabular}
+\caption{Specifications of different GPUs, including memory, power consumption, micro-architecture, FP16 TFLOPS, memory bandwidth, and their providers.}
+\label{tab:gpu_specifications}
+\end{table}
+
+\noindent We ran the same set of kernels generated in Section \ref{4.1} on a variety of hardware (as listed in Table \ref{tab:gpu_specifications}). We computed the \fast{1} speedup against the PyTorch Eager baseline profiled on that particular hardware platform in Table \ref{tab:speedup-hardware-comparison}.
+
+\input{tables/across-hw}
+
+\noindent Based on the increased variability in \fast{1} score for DeepSeek R1 as described in Section \ref{section:perf-across-hardware} and Table \ref{tab:speedup-hardware-comparison}, we plot the individual speedups for each problem (in Levels 1 and 2) across different GPUs. Speedup is computed against PyTorch Eager and there is a horizontal line at $y = 1.0$ to mark the cutoff for \fast{1}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{figures/DeepSeekR1_Level1_HW.png}
+    \caption{Speedup comparison across different GPUs for DeepSeek R1 on Level 1 (log scale).}
+    \label{fig:r1_eager_level1_hw}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/DeepSeekR1_Level2_HW.png}
+    \caption{Speedup comparison across different GPUs for DeepSeek-R1 on Level 2 (log scale).}
+    \label{fig:r1_eager_level2_hw}
+\end{figure}
+
+\subsection{Effect of Providing Hardware Information}
+
+We provided hardware-specific information such as the GPU's micro-architecture, TFLOPS, and memory bandwidth (as shown in Table \ref{tab:gpu_specifications}) to models during kernel generation. These generations were then profiled on their respective hardware platforms. The speedup in terms of \fast{1} over PyTorch Eager is provided below in Table \ref{tab:speedup-hardware-comparison-prompting}.
+
+\input{tables/across-hw-prompting}
+
+As described in Section \ref{subsection:hardware-prompting-study}, DeepSeek-R1 begins to generate kernels with  warp matrix multiply-accumulate (\texttt{wmma}) instructions. We show the generated kernel for Problem 1 Level 1 when provided with H100 specifications in context below.
+
+\begin{figure}
+\begin{lstlisting}
+#include <torch/extension.h>
+#include <cuda_fp16.h>
+#include <cuda_runtime.h>
+#include <mma.h>
+
+using namespace nvcuda;
+
+__global__ void hgemm_kernel(const half* A, const half* B, half* C, int N) {
+    const int WARPS_PER_BLOCK = 8;
+    const int WMMA_M = 16;
+    const int WMMA_N = 16;
+    const int WMMA_K = 16;
+    
+    __shared__ half Ashared[WARPS_PER_BLOCK][WMMA_M][WMMA_K];
+    __shared__ half Bshared[WARPS_PER_BLOCK][WMMA_K][WMMA_N];
+
+    int warpId = threadIdx.x / 32;
+    int laneId = threadIdx.x % 32;
+    
+    int tileM = (blockIdx.y * WARPS_PER_BLOCK + warpId) * WMMA_M;
+    int tileN = blockIdx.x * WMMA_N;
+    
+    wmma::fragment<wmma::matrix_a, WMMA_M, WMMA_N, WMMA_K, half, wmma::row_major> a_frag;
+    wmma::fragment<wmma::matrix_b, WMMA_M, WMMA_N, WMMA_K, half, wmma::row_major> b_frag;
+    wmma::fragment<wmma::accumulator, WMMA_M, WMMA_N, WMMA_K, half> c_frag;
+    wmma::fill_fragment(c_frag, __float2half(0.0f));
+
+    for (int k = 0; k < N; k += WMMA_K) {
+        int loadAidx = laneId + (tileM + (laneId / WMMA_K)) * N + k + (laneId % WMMA_K);
+        int loadBidx = laneId + (k + (laneId / WMMA_N)) * N + tileN + (laneId % WMMA_N);
+        
+        if (tileM + (laneId / WMMA_K) < N && k + (laneId % WMMA_K) < N)
+            Ashared[warpId][laneId / WMMA_K][laneId % WMMA_K] = A[loadAidx];
+        else
+            Ashared[warpId][laneId / WMMA_K][laneId % WMMA_K] = __float2half(0.0f);
+
+        if (k + (laneId / WMMA_N) < N && tileN + (laneId % WMMA_N) < N)
+            Bshared[warpId][laneId / WMMA_N][laneId % WMMA_N] = B[loadBidx];
+        else
+            Bshared[warpId][laneId / WMMA_N][laneId % WMMA_N] = __float2half(0.0f);
+
+        __syncthreads();
+
+        wmma::load_matrix_sync(a_frag, &Ashared[warpId][0][0], WMMA_K);
+        wmma::load_matrix_sync(b_frag, &Bshared[warpId][0][0], WMMA_N);
+        wmma::mma_sync(c_frag, a_frag, b_frag, c_frag);
+        
+        __syncthreads();
+    }
+
+    int storeCidx = (tileM + (laneId / WMMA_N)) * N + tileN + (laneId % WMMA_N);
+    if (tileM + (laneId / WMMA_N) < N && tileN + (laneId % WMMA_N) < N)
+        C[storeCidx] = c_frag.x[laneId];
+}
+
+torch::Tensor hgemm_cuda(torch::Tensor A, torch::Tensor B, int N) {
+    auto C = torch::zeros({N, N}, A.options().dtype(torch::kFloat16));
+    
+    const int WARPS_PER_BLOCK = 8;
+    dim3 grid((N + 15) / 16, (N + 15) / (16 * WARPS_PER_BLOCK));
+    dim3 block(32 * WARPS_PER_BLOCK);
+    
+    hgemm_kernel<<<grid, block>>>(A.data_ptr<half>(), B.data_ptr<half>(), C.data_ptr<half>(), N);
+    return C;
+}
+\end{lstlisting}
+\caption{A CUDA kernel generated by DeepSeek-R1 for Level 1 Problem 1 when provided with hardware-specific information on the H100 GPU.}
+\label{fig:example_r1_generated_kernel_hw}
+\end{figure}
+\FloatBarrier

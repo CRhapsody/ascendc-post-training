@@ -1,0 +1,34 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569","primaryTextColor":"#0f172a"},"flowchart":{"curve":"linear","htmlLabels":true,"nodeSpacing":35,"rankSpacing":40}}}%%
+flowchart TB
+    systemContext["M0 · system<br/>角色、工具与工程规则"]
+    userTask["M1 · user<br/>GroupedMatmulSliceM<br/>reference 路径<br/>输出目录、NPU 9"]
+    dispatch["M2 · assistant<br/>同批调用 Read / Bash"]
+    readCall["Read<br/>读取算子 reference 源码"]
+    directoryCall["Bash<br/>ls 检查输出目录"]
+    referenceReply["M3 · tool<br/>返回 reference 源码<br/>Model 与输入生成器"]
+    directoryReply["M4 · tool<br/>Bash completed with no output"]
+    classify["M5 · assistant<br/>识别分组矩阵乘法<br/>选择 TileLang 路径"]
+    delegateCall["Agent<br/>委派子 Agent<br/>ascend-kernel-developer<br/>路径、NPU、阶段要求"]
+    delegateReply["M6 · tool<br/>子 Agent 返回摘要<br/>内部执行日志未保存"]
+    finalReply["M7 · assistant<br/>依据摘要汇总成果"]
+
+    systemContext -. "规则上下文" .-> dispatch
+    userTask --> dispatch
+    dispatch --> readCall
+    dispatch --> directoryCall
+    readCall -->|调用 ID 对应| referenceReply
+    directoryCall -->|调用 ID 对应| directoryReply
+    referenceReply -->|算子语义| classify
+    directoryReply -. "已返回的会话上下文" .-> classify
+    classify --> delegateCall
+    delegateCall -->|调用 ID 对应| delegateReply
+    delegateReply --> finalReply
+
+    classDef context fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef assistant fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef tool fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    classDef opaque fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    class systemContext,userTask context;
+    class dispatch,classify,finalReply assistant;
+    class readCall,directoryCall,referenceReply,directoryReply tool;
+    class delegateCall,delegateReply opaque;

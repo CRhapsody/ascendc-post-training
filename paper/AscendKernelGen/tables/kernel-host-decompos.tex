@@ -1,0 +1,52 @@
+\begin{table}[t]
+\begin{tcolorbox}[
+sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Host-Kernel Decomposition}},
+      fonttitle=\bfseries\small,
+      top=-10pt, bottom=0pt, left=1pt, right=1pt
+]
+\begin{tabular}{p{0.48\textwidth} p{0.48\textwidth}}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+# Before decomposing
+.../{op_name}/answer/
++-- 0/
+    |-- op_host/
+    |   |-- add_custom.h
+    |   `-- add_custom.cpp
+    `-- op_kernel/
+        |-- add_custom.h
+        `-- add_custom.cpp
+\end{lstlisting}
+&
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+# After decomposing
+.../{op_name}/answer/
++-- 0/
+|   +-- ... (Original backup)
++-- 1/
+|   +-- op_host/ (<- The Host code of scenario 1.)
+|   |   +-- add_custom.h
+|   |   `-- add_custom.cpp
+|   +-- op_kernel/
+|   |   +-- add_custom.h
+|   |   `-- add_custom.cpp
+|   `-- tiling_key.json
+`-- 2/
+    +-- op_host/ (<- The Host code of scenario 2.)
+    |   +-- add_custom.h
+    |   `-- add_custom.cpp
+    +-- op_kernel/
+    |   +-- add_custom.h
+    |   `-- add_custom.cpp
+    `-- tiling_key.json
+\end{lstlisting}
+\end{tabular}
+\end{tcolorbox}
+\caption{The kernel code structure before and after decoupling. }
+\label{tab:kernel_host_decompos}
+\end{table}

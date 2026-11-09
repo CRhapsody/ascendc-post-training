@@ -1,0 +1,22 @@
+\begin{table}[t]
+    \centering
+    \caption{Full-tuning \textit{V.S.} LoRA-tuning in QWen3-8B model.}
+    \resizebox{0.75\linewidth}{!}{
+    \begin{tabular}{l cc c c}
+            \toprule
+            \textbf{Model} & \textbf{Level} & \textbf{Compile Rate (\%)} & \textbf{Exec. Rate (\%)} & \textbf{Speedup ($\times$)} \\
+            \midrule
+            \multirow{4}{*}{LoRA-tuning}  & Level 1   & 54.94 & 20.10  & 0.48 \\  
+            & Level 2    & 14.58 & 0.67   & 0.52 \\  
+            & Level 3    & 3.83  & 0.00   & - \\ 
+            \rowcolor{bggreen}
+            & Mean       & 40.29 & 13.55  & 0.48 \\ \hline
+             \multirow{4}{*}{Full-tuning}      & Level 1    & 70.67 & 32.17 & 0.58 \\
+            & Level 2    & 34.50 & 3.08  & 2.77 \\ 
+            & Level 3    & 4.83  & 0.00  & - \\ 
+            \rowcolor{bggreen}
+            & Mean       & \textbf{55.32} & \textbf{22.13} & \textbf{0.95} \\ 
+            \bottomrule
+        \end{tabular}
+    \label{tab:full_vs_lora}}
+\end{table}

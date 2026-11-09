@@ -1,0 +1,56 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569","primaryTextColor":"#0f172a"},"flowchart":{"curve":"linear","htmlLabels":true,"nodeSpacing":30,"rankSpacing":40}}}%%
+flowchart TB
+    referenceInput["教学构造输入<br/>A = [[1,2],[3,4],[5,6]]<br/>group_list = [1,1,3]<br/>三个 B，均为两行一列"]
+    initialState["初始化<br/>K=2；A 展平<br/>offset=0；start=0；results=[]"]
+
+    subgraph groupZero["第 0 组 · end=1"]
+        sizeZero["行数 m=1-0=1<br/>非空组"]
+        sliceZero["A_flat[0:2]，view(1,2)<br/>得到 [[1,2]]"]
+        weightZero["选择 B[0]<br/>[[1],[0]]"]
+        matmulZero["matmul 后 flatten<br/>本组结果 [1]"]
+        stateOne["追加结果并推进状态<br/>offset=2；start=1；results=[[1]]"]
+    end
+
+    subgraph groupOne["第 1 组 · end=1"]
+        emptyOne["行数 m=1-1=0<br/>跳过切片、B[1]、matmul 与追加"]
+        stateTwo["沿用状态<br/>offset=2；start=1；results=[[1]]"]
+    end
+
+    subgraph groupTwo["第 2 组 · end=3"]
+        sizeTwo["行数 m=3-1=2<br/>非空组"]
+        sliceTwo["A_flat[2:6]，view(2,2)<br/>得到 [[3,4],[5,6]]"]
+        weightTwo["选择 B[2]<br/>[[0],[1]]"]
+        matmulTwo["matmul 后 flatten<br/>本组结果 [4,6]"]
+        stateThree["追加结果并推进状态<br/>offset=6；start=3<br/>results=[[1],[4,6]]"]
+    end
+
+    concatenate["torch.cat(results)<br/>输出一维张量<br/>[1,4,6]，长度 3"]
+
+    referenceInput --> initialState
+    initialState --> sizeZero
+    sizeZero --> sliceZero
+    referenceInput --> weightZero
+    sizeZero -. "非空分支" .-> weightZero
+    sliceZero --> matmulZero
+    weightZero --> matmulZero
+    matmulZero --> stateOne
+    stateOne --> emptyOne
+    emptyOne --> stateTwo
+    stateTwo --> sizeTwo
+    sizeTwo --> sliceTwo
+    referenceInput --> weightTwo
+    sizeTwo -. "非空分支" .-> weightTwo
+    sliceTwo --> matmulTwo
+    weightTwo --> matmulTwo
+    matmulTwo --> stateThree
+    stateThree --> concatenate
+    initialState -. "A_flat 与 K" .-> sliceTwo
+
+    classDef input fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef compute fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef skipped fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    classDef output fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    class referenceInput,initialState input;
+    class sizeZero,sliceZero,weightZero,matmulZero,stateOne,sizeTwo,sliceTwo,weightTwo,matmulTwo,stateThree compute;
+    class emptyOne,stateTwo skipped;
+    class concatenate output;

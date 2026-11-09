@@ -1,0 +1,49 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569"},"flowchart":{"curve":"linear","nodeSpacing":28,"rankSpacing":30,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M2–5 读取参考与 case 路径<br/>有序专家索引的累积计数"]
+    taskFailure["M6–14 登记任务失败<br/>TaskCreate 不接受 status"]
+    cases["M15–33 初始化并备份<br/>15 个 int32 case 精简为 8"]
+    histogram["M34–45 写初版设计<br/>局部直方图与前缀和"]
+    binarySearch["M54–65 重写设计<br/>按专家分工，使用二分查找"]
+    tileAst["M66–73 TileLang AST 通过<br/>声明跳过功能验证"]
+    code["M76–119 写 AscendC 工程<br/>候选 AST 检查 通过"]
+    hookFailure["M120–122 首次评测未执行<br/>Hook 把 export 当程序"]
+    compileFailure["M123–125 去掉前缀后编译<br/>TQue.InitBuffer 参数错误"]
+    bufferFix["M126–131 修改缓冲区<br/>输入与输出改用 TBuf"]
+    initFailure["M132–133 重建进入验证<br/>Model 构造器参数错误"]
+    initFix["M134–145 对照验证器<br/>候选 get_init_inputs 返回 []"]
+    eightPass["M146–150 重测 通过<br/>8/8 case matched"]
+    perfFailure["M154–156 官方性能脚本报错<br/>双方构造器参数不兼容"]
+    manualScript["M157–166 检查并写计时器<br/>预热 5 次，同步计时 50 次"]
+    performance["M167–168 手写计时返回<br/>8 例时延总和比 59.20x"]
+    restore["M169–170 恢复原备份<br/>重新使用 15 例"]
+    fullPass["M171–175 全量重测<br/>15/15 case matched"]
+    declaration["M176–183 记录并总结<br/>声明完成，删除临时计时器"]
+    reference --> taskFailure
+    taskFailure --> cases
+    cases --> histogram
+    histogram --> binarySearch
+    binarySearch --> tileAst
+    tileAst --> code
+    code --> hookFailure
+    hookFailure --> compileFailure
+    compileFailure --> bufferFix
+    bufferFix --> initFailure
+    initFailure --> initFix
+    initFix --> eightPass
+    eightPass --> perfFailure
+    perfFailure --> manualScript
+    manualScript --> performance
+    performance --> restore
+    restore --> fullPass
+    fullPass --> declaration
+    classDef action fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef pass fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    classDef fail fill:#fee2e2,stroke:#dc2626,color:#0f172a;
+    classDef context fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef limited fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    class cases,histogram,binarySearch,code,bufferFix,initFix,manualScript,restore action;
+    class tileAst,eightPass,fullPass pass;
+    class taskFailure,hookFailure,compileFailure,initFailure,perfFailure fail;
+    class reference context;
+    class performance,declaration limited;

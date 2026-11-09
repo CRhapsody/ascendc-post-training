@@ -1,0 +1,110 @@
+{
+  "source_repository": "https://gitcode.com/Ascend/ascendc-kernelgen-data",
+  "commit": "0607a29d231cde384c9dfdb8a39f54f91837c327",
+  "sample_index_basis": "zero-based; JSON array index or nonempty decoded JSONL record index",
+  "status": "Source bytes verified against Git LFS oid; content has not been compiled or executed. Selected records preserve the original JSON values.",
+  "samples": [
+    {
+      "file": "api_qa.json",
+      "source_path": "dataset/dataset/doc_data_9.1.0/ascendc_api_qa_910.json",
+      "source_record_index": 0,
+      "source_file_bytes": 10978053,
+      "source_file_sha256": "64bc94db3358d691a1d75d694b03f4942cef8d9a458705ce06636dcdb3bbc6dd",
+      "record_canonical_sha256": "69ea1b9dc964f8bb3903eeacc7444720b41c5c51443c26759e7fe706854181c1",
+      "saved_file_sha256": "c07db9da6d3dd04ad060fe9728899445e4c75c462e0158de400a788dd1dcbe9e",
+      "source_summary": {
+        "records": 5969,
+        "schema": "alpaca",
+        "output_chars_min": 124,
+        "output_chars_mean": 595.2268386664433,
+        "output_chars_max": 1648,
+        "records_with_nonempty_system": 0,
+        "records_with_nonempty_history": 0,
+        "records_with_think_pair": 5969,
+        "unique_canonical_records": 5969
+      }
+    },
+    {
+      "file": "vector_mse.json",
+      "source_path": "dataset/dataset/vector_data/202605_0004.json",
+      "source_record_index": 6,
+      "source_file_bytes": 9948822,
+      "source_file_sha256": "b76d651c8f42bfa579db56fb92da192c902a0c5001b8144607f623af1d9a5d74",
+      "record_canonical_sha256": "2c5eae98148a082007361f34fe3d839f0d0fc5ac53c61e8852fbf7cc76ee1256",
+      "saved_file_sha256": "06cda2973d1dbcd530eb92767df93eb5c1e94d50afd2ad21abc3e199aeaa9806",
+      "source_summary": {
+        "records": 94,
+        "schema": "alpaca",
+        "output_chars_min": 33208,
+        "output_chars_mean": 96096.08510638298,
+        "output_chars_max": 599391,
+        "records_with_nonempty_system": 94,
+        "records_with_nonempty_history": 0,
+        "records_with_think_pair": 94,
+        "unique_canonical_records": 94,
+        "unique_text_after_first_close_think": 14
+      }
+    },
+    {
+      "file": "logit_generation.json",
+      "source_path": "dataset/dataset/sft_distill_data/sft_gen.json",
+      "source_record_index": 3,
+      "source_file_bytes": 5621483,
+      "source_file_sha256": "96fae4166bd78144d7ebe5dd583446fb3e75fd740e98f43f94161959c27e3f0a",
+      "record_canonical_sha256": "4fe1a856e7fd132d2ccd33b45e631f5a04d4ff1b7e2a0c2ea5c04460d5d20e82",
+      "saved_file_sha256": "37d3938519d572c5bbccf71d438fc919bc5bd82de2629f3a76cf833fa88b8669",
+      "source_summary": {
+        "records": 316,
+        "schema": "alpaca",
+        "output_chars_min": 5261,
+        "output_chars_mean": 15410.64240506329,
+        "output_chars_max": 57210,
+        "records_with_nonempty_system": 0,
+        "records_with_nonempty_history": 0,
+        "records_with_think_pair": 316,
+        "unique_canonical_records": 316
+      }
+    },
+    {
+      "file": "logit_debug.json",
+      "source_path": "dataset/dataset/sft_distill_data/sft_debug.json",
+      "source_record_index": 3,
+      "source_file_bytes": 915363,
+      "source_file_sha256": "6395ae700b3c93d1946ebe37ef612d7bfb99c23c83a3e5018f50cb95a2525cb5",
+      "record_canonical_sha256": "517266ee9dc721d4c5fd41c49907c8dfeabd7a88572b73b0499b3e2b0758615a",
+      "saved_file_sha256": "9a1b76260f43ff9c315902e37f077a605444e75c43eea41c9ac5f14972917f0f",
+      "source_summary": {
+        "records": 236,
+        "schema": "alpaca",
+        "output_chars_min": 386,
+        "output_chars_mean": 2319.487288135593,
+        "output_chars_max": 7592,
+        "records_with_nonempty_system": 0,
+        "records_with_nonempty_history": 0,
+        "records_with_think_pair": 236,
+        "unique_canonical_records": 236
+      }
+    },
+    {
+      "file": "agent_groupedmatmul.json",
+      "source_path": "dataset/agent_dataset/train-00000.jsonl.zst",
+      "source_record_index": 10,
+      "source_file_bytes": 12913249,
+      "source_file_sha256": "939380d5167ddb14a9454bdd73dab9e91e30e9834b63792ded2e1e9ee56d5ad4",
+      "record_canonical_sha256": "8b24e5e03a79b1a94b4859c222568079b04b046ccea13dec772a2dd3283e6396",
+      "saved_file_sha256": "6079865160691d5badbe9e32f3b9b94e20e42434cc6edde741762ba73bccfd87",
+      "source_summary": {
+        "records": 1000,
+        "schema": "messages",
+        "unique_canonical_records": 1000,
+        "tool_call_id_sequence_groups": 100,
+        "tool_call_id_sequence_group_sizes": {
+          "10": 100
+        },
+        "message_count_min": 7,
+        "message_count_max": 542,
+        "message_count_median": 73.0
+      }
+    }
+  ]
+}

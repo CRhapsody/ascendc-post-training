@@ -1,0 +1,249 @@
+\begin{thebibliography}{46}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Apple(2020)]{applemlx}
+Apple.
+\newblock Apple ml compute framework (mlx), 2020.
+\newblock URL \url{https://developer.apple.com/metal/}.
+
+\bibitem[Arora et~al.(2024)Arora, Eyuboglu, Zhang, Timalsina, Alberti, Zinsley, Zou, Rudra, and Ré]{arora2024simple}
+Simran Arora, Sabri Eyuboglu, Michael Zhang, Aman Timalsina, Silas Alberti, Dylan Zinsley, James Zou, Atri Rudra, and Christopher Ré.
+\newblock Simple linear attention language models balance the recall-throughput tradeoff.
+\newblock \emph{International Conference on Machine Learning}, 2024.
+
+\bibitem[Brown et~al.(2024)Brown, Juravsky, Ehrlich, Clark, Le, Ré, and Mirhoseini]{brown2024largelanguagemonkeysscaling}
+Bradley Brown, Jordan Juravsky, Ryan Ehrlich, Ronald Clark, Quoc~V. Le, Christopher Ré, and Azalia Mirhoseini.
+\newblock Large language monkeys: Scaling inference compute with repeated sampling, 2024.
+\newblock URL \url{https://arxiv.org/abs/2407.21787}.
+
+\bibitem[Cerebras()]{cerebras-wse}
+Cerebras.
+\newblock Cerebras wafer-scale engine wse architecture.
+\newblock Online.
+\newblock \url{https://cerebras.ai/product-chip/}.
+
+\bibitem[Chen et~al.(2021)Chen, Tworek, Jun, Yuan, de~Oliveira~Pinto, Kaplan, Edwards, Burda, Joseph, Brockman, Ray, Puri, Krueger, Petrov, Khlaaf, Sastry, Mishkin, Chan, Gray, Ryder, Pavlov, Power, Kaiser, Bavarian, Winter, Tillet, Such, Cummings, Plappert, Chantzis, Barnes, Herbert-Voss, Guss, Nichol, Paino, Tezak, Tang, Babuschkin, Balaji, Jain, Saunders, Hesse, Carr, Leike, Achiam, Misra, Morikawa, Radford, Knight, Brundage, Murati, Mayer, Welinder, McGrew, Amodei, McCandlish, Sutskever, and Zaremba]{chen2021evaluatinglargelanguagemodels}
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique~Ponde de~Oliveira~Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe~Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William~Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew~N. Carr, Jan Leike, Josh Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba.
+\newblock Evaluating large language models trained on code, 2021.
+\newblock URL \url{https://arxiv.org/abs/2107.03374}.
+
+\bibitem[Dao(2024)]{dao2023flashattention2}
+Tri Dao.
+\newblock Flash{A}ttention-2: Faster attention with better parallelism and work partitioning.
+\newblock \emph{International Conference on Learning Representations}, 2024.
+
+\bibitem[Dao \& Gu(2024)Dao and Gu]{dao2024transformers}
+Tri Dao and Albert Gu.
+\newblock Transformers are ssms: Generalized models and efficient algorithms through structured state space duality.
+\newblock \emph{International Conference on Machine Learning (ICML)}, 2024.
+
+\bibitem[Dao et~al.(2022)Dao, Fu, Ermon, Rudra, and R{\'e}]{dao2022flashattention}
+Tri Dao, Daniel~Y. Fu, Stefano Ermon, Atri Rudra, and Christopher R{\'e}.
+\newblock Flash{A}ttention: Fast and memory-efficient exact attention with {IO}-awareness.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2022.
+
+\bibitem[DeepSeek-AI(2025)]{deepseekv3}
+DeepSeek-AI.
+\newblock Deepseek-v3 technical report, 2025.
+\newblock URL \url{https://github.com/deepseek-ai/DeepSeek-V3}.
+
+\bibitem[Graphcore()]{graphcore-ipu}
+Graphcore.
+\newblock Graphcore {IPU} architecture.
+\newblock Online.
+\newblock \url{https://www.graphcore.ai/products/ipu}.
+
+\bibitem[Groq()]{groq-chip}
+Groq.
+\newblock Groq architecture.
+\newblock Online.
+\newblock \url{https://groq.com/}.
+
+\bibitem[Grubisic et~al.(2024)Grubisic, Cummins, Seeker, and Leather]{grubisic2024prioritysamplinglargelanguage}
+Dejan Grubisic, Chris Cummins, Volker Seeker, and Hugh Leather.
+\newblock Priority sampling of large language models for compilers, 2024.
+\newblock URL \url{https://arxiv.org/abs/2402.18734}.
+
+\bibitem[Hendrycks \& Gimpel(2023)Hendrycks and Gimpel]{hendrycks2023gaussianerrorlinearunits}
+Dan Hendrycks and Kevin Gimpel.
+\newblock Gaussian error linear units (gelus), 2023.
+\newblock URL \url{https://arxiv.org/abs/1606.08415}.
+
+\bibitem[Jouppi et~al.(2023)Jouppi, Kurian, Li, Ma, Nagarajan, Nai, Patil, Subramanian, Swing, Towles, Young, Zhou, Zhou, and Patterson]{jouppi2023tpuv4opticallyreconfigurable}
+Norman~P. Jouppi, George Kurian, Sheng Li, Peter Ma, Rahul Nagarajan, Lifeng Nai, Nishant Patil, Suvinay Subramanian, Andy Swing, Brian Towles, Cliff Young, Xiang Zhou, Zongwei Zhou, and David Patterson.
+\newblock Tpu v4: An optically reconfigurable supercomputer for machine learning with hardware support for embeddings, 2023.
+\newblock URL \url{https://arxiv.org/abs/2304.01433}.
+
+\bibitem[Kim(2024)]{kim2024flashattention}
+Peter Kim.
+\newblock Flashattention minimal.
+\newblock Online, 2024.
+\newblock \url{https://github.com/tspeterkim/flash-attention-minimal}.
+
+\bibitem[Kocetkov et~al.(2022)Kocetkov, Li, Allal, Li, Mou, Ferrandis, Jernite, Mitchell, Hughes, Wolf, Bahdanau, von Werra, and de~Vries]{kocetkov2022stack3tbpermissively}
+Denis Kocetkov, Raymond Li, Loubna~Ben Allal, Jia Li, Chenghao Mou, Carlos~Muñoz Ferrandis, Yacine Jernite, Margaret Mitchell, Sean Hughes, Thomas Wolf, Dzmitry Bahdanau, Leandro von Werra, and Harm de~Vries.
+\newblock The stack: 3 tb of permissively licensed source code, 2022.
+\newblock URL \url{https://arxiv.org/abs/2211.15533}.
+
+\bibitem[Lai et~al.(2022)Lai, Li, Wang, Zhang, Zhong, Zettlemoyer, tau Yih, Fried, Wang, and Yu]{lai2022ds1000naturalreliablebenchmark}
+Yuhang Lai, Chengxi Li, Yiming Wang, Tianyi Zhang, Ruiqi Zhong, Luke Zettlemoyer, Scott~Wen tau Yih, Daniel Fried, Sida Wang, and Tao Yu.
+\newblock Ds-1000: A natural and reliable benchmark for data science code generation, 2022.
+\newblock URL \url{https://arxiv.org/abs/2211.11501}.
+
+\bibitem[Li et~al.(2023)Li, Allal, Zi, Muennighoff, Kocetkov, Mou, Marone, Akiki, Li, Chim, Liu, Zheltonozhskii, Zhuo, Wang, Dehaene, Davaadorj, Lamy-Poirier, Monteiro, Shliazhko, Gontier, Meade, Zebaze, Yee, Umapathi, Zhu, Lipkin, Oblokulov, Wang, Murthy, Stillerman, Patel, Abulkhanov, Zocca, Dey, Zhang, Fahmy, Bhattacharyya, Yu, Singh, Luccioni, Villegas, Kunakov, Zhdanov, Romero, Lee, Timor, Ding, Schlesinger, Schoelkopf, Ebert, Dao, Mishra, Gu, Robinson, Anderson, Dolan-Gavitt, Contractor, Reddy, Fried, Bahdanau, Jernite, Ferrandis, Hughes, Wolf, Guha, von Werra, and de~Vries]{li2023starcodersourceyou}
+Raymond Li, Loubna~Ben Allal, Yangtian Zi, Niklas Muennighoff, Denis Kocetkov, Chenghao Mou, Marc Marone, Christopher Akiki, Jia Li, Jenny Chim, Qian Liu, Evgenii Zheltonozhskii, Terry~Yue Zhuo, Thomas Wang, Olivier Dehaene, Mishig Davaadorj, Joel Lamy-Poirier, João Monteiro, Oleh Shliazhko, Nicolas Gontier, Nicholas Meade, Armel Zebaze, Ming-Ho Yee, Logesh~Kumar Umapathi, Jian Zhu, Benjamin Lipkin, Muhtasham Oblokulov, Zhiruo Wang, Rudra Murthy, Jason Stillerman, Siva~Sankalp Patel, Dmitry Abulkhanov, Marco Zocca, Manan Dey, Zhihan Zhang, Nour Fahmy, Urvashi Bhattacharyya, Wenhao Yu, Swayam Singh, Sasha Luccioni, Paulo Villegas, Maxim Kunakov, Fedor Zhdanov, Manuel Romero, Tony Lee, Nadav Timor, Jennifer Ding, Claire Schlesinger, Hailey Schoelkopf, Jan Ebert, Tri Dao, Mayank Mishra, Alex Gu, Jennifer Robinson, Carolyn~Jane Anderson, Brendan Dolan-Gavitt, Danish Contractor, Siva Reddy, Daniel Fried, Dzmitry Bahdanau, Yacine Jernite, Carlos~Muñoz Ferrandis, Sean Hughes, Thomas Wolf, Arjun Guha, Leandro von
+  Werra, and Harm de~Vries.
+\newblock Starcoder: may the source be with you!, 2023.
+\newblock URL \url{https://arxiv.org/abs/2305.06161}.
+
+\bibitem[Li et~al.(2022)Li, Choi, Chung, Kushman, Schrittwieser, Leblond, Eccles, Keeling, Gimeno, Dal~Lago, Hubert, Choy, de~Masson~d’Autume, Babuschkin, Chen, Huang, Welbl, Gowal, Cherepanov, Molloy, Mankowitz, Sutherland~Robson, Kohli, de~Freitas, Kavukcuoglu, and Vinyals]{Li_2022}
+Yujia Li, David Choi, Junyoung Chung, Nate Kushman, Julian Schrittwieser, Rémi Leblond, Tom Eccles, James Keeling, Felix Gimeno, Agustin Dal~Lago, Thomas Hubert, Peter Choy, Cyprien de~Masson~d’Autume, Igor Babuschkin, Xinyun Chen, Po-Sen Huang, Johannes Welbl, Sven Gowal, Alexey Cherepanov, James Molloy, Daniel~J. Mankowitz, Esme Sutherland~Robson, Pushmeet Kohli, Nando de~Freitas, Koray Kavukcuoglu, and Oriol Vinyals.
+\newblock Competition-level code generation with alphacode.
+\newblock \emph{Science}, 378\penalty0 (6624):\penalty0 1092–1097, December 2022.
+\newblock ISSN 1095-9203.
+\newblock \doi{10.1126/science.abq1158}.
+\newblock URL \url{http://dx.doi.org/10.1126/science.abq1158}.
+
+\bibitem[Mills(2024)]{mills2024cuda}
+Christian~J. Mills.
+\newblock Cuda mode notes - lecture 004.
+\newblock Online, 2024.
+\newblock \url{https://christianjmills.com/posts/cuda-mode-notes/lecture-004/}.
+
+\bibitem[Nichols et~al.(2024)Nichols, Polasam, Menon, Marathe, Gamblin, and Bhatele]{nichols2024performancealignedllmsgeneratingfast}
+Daniel Nichols, Pranav Polasam, Harshitha Menon, Aniruddha Marathe, Todd Gamblin, and Abhinav Bhatele.
+\newblock Performance-aligned llms for generating fast code, 2024.
+\newblock URL \url{https://arxiv.org/abs/2404.18864}.
+
+\bibitem[NVIDIA(2014)]{nvidiacudnn}
+NVIDIA.
+\newblock cudnn: Gpu-accelerated library for deep neural networks, 2014.
+\newblock URL \url{https://developer.nvidia.com/cudnn}.
+
+\bibitem[NVIDIA(2017{\natexlab{a}})]{nvidia2017cutlass}
+NVIDIA.
+\newblock Cuda templates for linear algebra subroutines, 2017{\natexlab{a}}.
+\newblock URL \url{https://github.com/NVIDIA/cutlass}.
+
+\bibitem[NVIDIA(2017{\natexlab{b}})]{nvidia2017nvidia}
+NVIDIA.
+\newblock Nvidia {T}esla {V}100 {GPU} architecture, 2017{\natexlab{b}}.
+
+\bibitem[NVIDIA(2020)]{nvidia2020nvidia}
+NVIDIA.
+\newblock Nvidia {A}100 tensor core {GPU} architecture, 2020.
+
+\bibitem[NVIDIA(2022)]{nvidia2022nvidia}
+NVIDIA.
+\newblock Nvidia {H}100 tensor core {GPU} architecture, 2022.
+
+\bibitem[NVIDIA(2023)]{nvidia2023cublas}
+NVIDIA.
+\newblock {cuBLAS}, 2023.
+\newblock URL \url{https://docs.nvidia.com/cuda/cublas/}.
+
+\bibitem[Paszke et~al.(2019)Paszke, Gross, Massa, Lerer, Bradbury, Chanan, Killeen, Lin, Gimelshein, Antiga, Desmaison, Köpf, Yang, DeVito, Raison, Tejani, Chilamkurthy, Steiner, Fang, Bai, and Chintala]{paszke2019pytorchimperativestylehighperformance}
+Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, Alban Desmaison, Andreas Köpf, Edward Yang, Zach DeVito, Martin Raison, Alykhan Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu~Fang, Junjie Bai, and Soumith Chintala.
+\newblock Pytorch: An imperative style, high-performance deep learning library, 2019.
+\newblock URL \url{https://arxiv.org/abs/1912.01703}.
+
+\bibitem[Peng et~al.(2023)Peng, Alcaide, Anthony, Albalak, Arcadinho, Cao, Cheng, Chung, Grella, Kiran~GV, He, Hou, Kazienko, Kocon, and Kong]{peng2023rwkv}
+Bo~Peng, Eric Alcaide, Quentin Anthony, Alon Albalak, Samuel Arcadinho, Huanqi Cao, Xin Cheng, Michael Chung, Matteo Grella, Kranthi Kiran~GV, Xuzheng He, Haowen Hou, Przemyslaw Kazienko, Jan Kocon, and Jiaming et~al. Kong.
+\newblock Rwkv: Reinventing rnns for the transformer era.
+\newblock \emph{Findings of the Association for Computational Linguistics: EMNLP 2023}, 2023.
+
+\bibitem[Shah et~al.(2024)Shah, Bikshandi, Zhang, Thakkar, Ramani, and Dao]{dao2024flashattention3}
+Jay Shah, Ganesh Bikshandi, Ying Zhang, Vijay Thakkar, Pradeep Ramani, and Tri Dao.
+\newblock Flashattention-3: Fast and accurate attention with asynchrony and low-precision, 2024.
+\newblock URL \url{https://arxiv.org/abs/2407.08608}.
+
+\bibitem[Shi et~al.(2024)Shi, Tang, Narasimhan, and Yao]{shi2024languagemodelssolveolympiad}
+Quan Shi, Michael Tang, Karthik Narasimhan, and Shunyu Yao.
+\newblock Can language models solve olympiad programming?, 2024.
+\newblock URL \url{https://arxiv.org/abs/2404.10952}.
+
+\bibitem[Spector et~al.(2024)Spector, Arora, Singhal, Fu, and Ré]{spector2023thunderkittens}
+Benjamin Spector, Simran Arora, Aaryan Singhal, Daniel Fu, and Christopher Ré.
+\newblock Thunderkittens: Simple, fast, and adorable ai kernels.
+\newblock \emph{International Conference on Learning Representations (ICLR)}, 2024.
+
+\bibitem[Tay et~al.(2022)Tay, Dehghani, Bahri, and Metzler]{tay2022efficient}
+Yi~Tay, Mostafa Dehghani, Dara Bahri, and Donald Metzler.
+\newblock Efficient transformers: A survey.
+\newblock \emph{ACM Computing Surveys}, 55\penalty0 (6):\penalty0 1--28, 2022.
+
+\bibitem[{Team PyTorch} et~al.(2024){Team PyTorch}, He, Guessous, Liang, and Dong]{he2024flexattention}
+{Team PyTorch}, Horace He, Driss Guessous, Yanbo Liang, and Joy Dong.
+\newblock {FlexAttention}: The flexibility of {PyTorch} with the performance of {FlashAttention}, 2024.
+\newblock URL \url{https://pytorch.org/blog/flexattention/}.
+
+\bibitem[TehraniJamsaz et~al.(2024)TehraniJamsaz, Bhattacharjee, Chen, Ahmed, Yazdanbakhsh, and Jannesari]{tehranijamsaz2024coderosetta}
+Ali TehraniJamsaz, Arijit Bhattacharjee, Le~Chen, Nesreen~K. Ahmed, Amir Yazdanbakhsh, and Ali Jannesari.
+\newblock Coderosetta: Pushing the boundaries of unsupervised code translation for parallel programming.
+\newblock In \emph{The Thirty-eighth Annual Conference on Neural Information Processing Systems}, 2024.
+\newblock URL \url{https://openreview.net/forum?id=V6hrg4O9gg}.
+
+\bibitem[Tillet et~al.(2019)Tillet, Kung, and Cox]{triton}
+Philippe Tillet, H.~T. Kung, and David Cox.
+\newblock Triton: an intermediate language and compiler for tiled neural network computations.
+\newblock In \emph{Proceedings of the 3rd ACM SIGPLAN International Workshop on Machine Learning and Programming Languages}, 2019.
+
+\bibitem[Turing(1936)]{turing1936a}
+Alan~M. Turing.
+\newblock On computable numbers, with an application to the {E}ntscheidungsproblem.
+\newblock \emph{Proceedings of the London Mathematical Society}, 2\penalty0 (42):\penalty0 230--265, 1936.
+\newblock URL \url{http://www.cs.helsinki.fi/u/gionis/cc05/OnComputableNumbers.pdf}.
+
+\bibitem[Valero-Lara et~al.(2023)Valero-Lara, Huante, Lail, Godoy, Teranishi, Balaprakash, and Vetter]{valerolara2023comparingllama2gpt3llms}
+Pedro Valero-Lara, Alexis Huante, Mustafa~Al Lail, William~F. Godoy, Keita Teranishi, Prasanna Balaprakash, and Jeffrey~S. Vetter.
+\newblock Comparing llama-2 and gpt-3 llms for hpc kernels generation, 2023.
+\newblock URL \url{https://arxiv.org/abs/2309.07103}.
+
+\bibitem[Vaswani et~al.(2017)Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, and Polosukhin]{vaswani2018attention}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan~N Gomez, Lukasz Kaiser, and Illia Polosukhin.
+\newblock Attention is all you need.
+\newblock \emph{31st Conference on Neural Information Processing Systems (NIPS 2017)}, 2017.
+
+\bibitem[Waghjale et~al.(2024)Waghjale, Veerendranath, Wang, and Fried]{waghjale-etal-2024-ecco}
+Siddhant Waghjale, Vishruth Veerendranath, Zhiruo Wang, and Daniel Fried.
+\newblock {ECCO}: Can we improve model-generated code efficiency without sacrificing functional correctness?
+\newblock In Yaser Al-Onaizan, Mohit Bansal, and Yun-Nung Chen (eds.), \emph{Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing}, pp.\  15362--15376, Miami, Florida, USA, November 2024. Association for Computational Linguistics.
+\newblock \doi{10.18653/v1/2024.emnlp-main.859}.
+\newblock URL \url{https://aclanthology.org/2024.emnlp-main.859/}.
+
+\bibitem[Wen et~al.(2022)Wen, Guo, Fu, Li, Xu, Tang, Zhao, Hu, Du, Li, Wang, Zhou, and Chen]{pmlr-v162-wen22b}
+Yuanbo Wen, Qi~Guo, Qiang Fu, Xiaqing Li, Jianxing Xu, Yanlin Tang, Yongwei Zhao, Xing Hu, Zidong Du, Ling Li, Chao Wang, Xuehai Zhou, and Yunji Chen.
+\newblock {B}abel{T}ower: Learning to auto-parallelized program translation.
+\newblock In Kamalika Chaudhuri, Stefanie Jegelka, Le~Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato (eds.), \emph{Proceedings of the 39th International Conference on Machine Learning}, volume 162 of \emph{Proceedings of Machine Learning Research}, pp.\  23685--23700. PMLR, 17--23 Jul 2022.
+\newblock URL \url{https://proceedings.mlr.press/v162/wen22b.html}.
+
+\bibitem[Wijk et~al.(2024)Wijk, Lin, Becker, Jawhar, Parikh, Broadley, Chan, Chen, Clymer, Dhyani, Ericheva, Garcia, Goodrich, Jurkovic, Kinniment, Lajko, Nix, Sato, Saunders, Taran, West, and Barnes]{wijk2024rebenchevaluatingfrontierai}
+Hjalmar Wijk, Tao Lin, Joel Becker, Sami Jawhar, Neev Parikh, Thomas Broadley, Lawrence Chan, Michael Chen, Josh Clymer, Jai Dhyani, Elena Ericheva, Katharyn Garcia, Brian Goodrich, Nikola Jurkovic, Megan Kinniment, Aron Lajko, Seraphina Nix, Lucas Sato, William Saunders, Maksym Taran, Ben West, and Elizabeth Barnes.
+\newblock Re-bench: Evaluating frontier ai r\&d capabilities of language model agents against human experts, 2024.
+\newblock URL \url{https://arxiv.org/abs/2411.15114}.
+
+\bibitem[Yang et~al.(2024{\natexlab{a}})Yang, Jimenez, Wettig, Lieret, Yao, Narasimhan, and Press]{yang2024swe}
+John Yang, Carlos~E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, and Ofir Press.
+\newblock Swe-agent: Agent-computer interfaces enable automated software engineering.
+\newblock \emph{arXiv:2405.15793}, 2024{\natexlab{a}}.
+
+\bibitem[Yang et~al.(2024{\natexlab{b}})Yang, Jimenez, Zhang, Lieret, Yang, Wu, Press, Muennighoff, Synnaeve, Narasimhan, Yang, Wang, and Press]{yang2024swebenchmultimodalaisystems}
+John Yang, Carlos~E. Jimenez, Alex~L. Zhang, Kilian Lieret, Joyce Yang, Xindi Wu, Ori Press, Niklas Muennighoff, Gabriel Synnaeve, Karthik~R. Narasimhan, Diyi Yang, Sida~I. Wang, and Ofir Press.
+\newblock Swe-bench multimodal: Do ai systems generalize to visual software domains?, 2024{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2410.03859}.
+
+\bibitem[Yang \& Zhang(2024)Yang and Zhang]{yang2024fla}
+Songlin Yang and Yu~Zhang.
+\newblock Fla: A triton-based library for hardware-efficient implementations of linear attention mechanism, January 2024.
+\newblock URL \url{https://github.com/sustcsonglin/flash-linear-attention}.
+
+\bibitem[Yin et~al.(2022)Yin, Li, Xiao, Rao, Wen, Shi, Howland, Bailey, Catasta, Michalewski, Polozov, and Sutton]{yin2022naturallanguagecodegeneration}
+Pengcheng Yin, Wen-Ding Li, Kefan Xiao, Abhishek Rao, Yeming Wen, Kensen Shi, Joshua Howland, Paige Bailey, Michele Catasta, Henryk Michalewski, Alex Polozov, and Charles Sutton.
+\newblock Natural language to code generation in interactive data science notebooks, 2022.
+\newblock URL \url{https://arxiv.org/abs/2212.09248}.
+
+\end{thebibliography}

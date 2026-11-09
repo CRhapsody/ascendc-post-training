@@ -1,0 +1,11 @@
+
+For this experiment, we provide in-context examples of optimization techniques such as fusion, tiling, recompute, and asynchrony to models during kernel generation. As described in Section \ref{subsection:few-shot}, we provide three in-context examples: a fused GELU ~\cite{hendrycks2023gaussianerrorlinearunits}, a tiled matrix multiplication ~\cite{mills2024cuda}, and a minimal Flash-Attention ~\cite{dao2022flashattention, kim2024flashattention} demonstrating effective shared memory I/O management. The prompt used for this experiment is described in Appendix~\ref{appendix:few-shot-study-prompts}. The speedup of these kernels were computed over PyTorch Eager. We compare the performance of these few-shot kernels over the one-shot baseline below.
+
+\input{tables/few_shot_greedy_perf_comparison}
+\FloatBarrier
+
+\noindent 77\% of matrix multiplication problems in Level 1 achieves a speedup over the one-shot baseline through tiling. The runtime comparison for each GEMM variant is presented below.
+\input{tables/few_shot_greedy_level_1}
+
+\noindent Few-shot kernels generated for the following problems in level 2 outperformed PyTorch Eager through aggressive shared memory I/O management.
+\input{tables/few_shot_greedy_level_2}

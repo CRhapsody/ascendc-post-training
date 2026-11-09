@@ -1,0 +1,252 @@
+\begin{tcolorbox}[
+    breakable,
+    rounded corners,
+    arc=3pt,
+    enhanced,
+    width=1\textwidth,
+    colframe=codegreen, % <----- CHANGED
+    colback=white,
+    title=\textbf{Prompt for generating project-level CoT},
+    fonttitle=\bfseries\small,
+    boxrule=0.6pt,
+    left=2pt,
+    right=2pt,
+    top=0pt,
+    bottom=1pt
+  ]
+    \begin{tcolorbox}[
+      sharp corners,
+      colframe=reforange,
+      colback=reforange!5,
+      colbacktitle=reforange!15,
+      coltitle=reforange,
+      boxrule=0.4pt,
+      title={\textbf{Instructions}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+{\small 
+You are an AscendC programming expert for the Huawei Ascend processor. Based on the given problem, code content, and hardware specification documentation, please generate a detailed chain-of-thought process and a summary of all member variable values within the structures, as well as the value of the tilingKey.
+The chain of thought should demonstrate the complete reasoning path from the problem to the final code outcome, including key thinking steps, logical analysis, and derivation.
+
+Requirements:
+
+Start reasoning from the problem itself, with reasoning details aligned with the implementation logic;
+
+Present a clear solution path;
+
+Include necessary analytical steps and intermediate reasoning;
+
+Guide the reasoning process step by step toward the final answer;
+
+Demonstrate your expertise and reasoning process as an AscendC specialist;
+
+......
+
+For the chain of thought, the following requirements apply:
+
+1. Begin from the problem and reason in the first-person “I”.
+
+2. Present yourself as a developer actively solving the problem, not as an AI that already knows the answer.
+
+3. Show the natural thought process from problem analysis to solution design and then to implementation. Code snippets may only reproduce content from the given material and must not be invented. Avoid statements such as “based on the example”.
+
+4. Include key decision points, technical considerations, and derivations.
+
+......
+
+11. Except for code and proper nouns, do not use English inside the internal reasoning process (chain of thought itself).
+
+12. Tiling parameters mainly include the following components:
+
+    - {BlockDim}: the value set by the \texttt{GetBlockDim()} function
+    
+    - {TilingKey}: the value set by the \texttt{SetTilingKey()} function (optional)
+    
+    - {Tiling structure member variables}: typically defined between
+      \texttt{BEGIN\_TILING\_DATA\_DEF()} and \texttt{END\_TILING\_DATA\_DEF()} in \texttt{*\_tiling.h}
+    
+......
+
+
+The chain of thought should be output in the following format:
+
+\texttt{<think>chain-of-thought</think}
+.}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=taskblue,
+      colback=taskblue!5,
+      colbacktitle=taskblue!15,
+      coltitle=taskblue,
+      boxrule=0.4pt,
+      title={\textbf{Test cases}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=0pt,
+      bottom=0pt
+    ]
+\begin{lstlisting}[style=mdstyle]
+## Function Description
+### Operator Function
+Returns a new tensor with the same shape as the input, where each element is the absolute value of the corresponding input element.
+### Formula
+$$
+x = [x_0, x_1, \ldots, x_{n-1}] \\
+y = [y_0, y_1, \ldots, y_{n-1}]
+$$
+$$
+y_i = |x_i|,\quad i = 0, 1, \ldots, n-1
+$$
+## API Definition
+### Python API
+This operator is implemented in C++ and exposed to Python via PyBind11 as `kernel_gen_ops.abs_math()`:
+```python
+def abs_math(tensor):
+    """
+    Custom AbsMath operator.
+
+    Args:
+        tensor (Tensor): Device-side aclTensor (input x).
+            Supported dtypes: bfloat16, float16, float32, int32, int64, DT_COMPLEX64.
+            Supported format: ND.
+
+    Returns:
+        Tensor: Device-side aclTensor (output y).
+            Same dtype/format as input. Output shape matches x.
+    """
+```
+## Usage Example
+```python
+import torch
+import kernel_gen_ops
+
+tensor = torch.tensor([-1.0, 2.0, -3.0], dtype=torch.float)
+result = kernel_gen_ops.abs_math(tensor)
+```
+## Constraints
+- ND format only.
+\end{lstlisting}
+ \end{tcolorbox}
+ 
+% --------------- Part 2: 
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{NPUs hardware configuration}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-4pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mdstyle]
+The introductory document for AscendC development includes the following sections:
+1. Overview of the Decoupled Architecture and Hardware Structure
+1.1 Features of the Decoupled Architecture
+The decoupled architecture of Ascend AI processors (e.g., Atlas A2/A3 series) splits the AI Core into two independent units: AI Cube (AIC) and AI Vector (AIV).
+AIC mainly handles matrix operations (Cube), while AIV is responsible for vector and scalar operations (Vector/Scalar).
+The two types of cores have independent scalar units, instruction streams, and local storage. Data is exchanged through Global Memory (GM).
+......
+The hardware model and specifications we are using are: [Platform Info configuration begin]
+#*************************************************************************************#
+[
+[version]
+SoC_version=Ascend910_9392
+Short_SoC_version=Ascend910_93   [PS: Ascend910_93 is the NPU's name.]
+AIC_version=AIC-C-220
+CCEC_AIC_version=dav-c220-cube
+CCEC_AIV_version=dav-c220-vec
+CCEC_CUBE_version=dav-c220-cube
+CCEC_VECTOR_version=dav-c220-vec
+......
+]
+
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Kernel source code}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-5pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mdstyle]
+Please, using the input shapes and other relevant information and taking the actual code implementation into account, outline the detailed design logic for operator tiling and kernel pipelining, and compute the operator’s tiling parameter values during the intermediate steps. Below is the code, consisting of multiple files separated by
+============================================================================================.
+You may refer to these files to support your reasoning, but they are only supplementary. Your answer should be based on your own thinking and judgment as an AscendC expert, not a verbatim restatement of the code:
+============================================================================================
+```cpp
+// op_host/abs_tiling.h
+/**
+ * @file abs_tiling.h
+ */
+#ifndef ABS_TILING_H
+#define ABS_TILING_H
+#include "register/tilingdata_base.h"
+namespace optiling {
+    ......
+}
+#endif // ADD_CUSTOM_TILING_H
+```
+==========================================================================================
+```cpp
+// op_host/abs_math.cpp
+/**
+ * @file abs.cpp
+ */
+#include "abs_tiling.h"
+#include "register/op_def_registry.h"
+#include "tiling/platform/platform_ascendc.h"
+namespace optiling {      
+    ......
+}
+namespace ops {
+class AbsMath : public OpDef {
+    ......
+};OP_ADD(AbsMath);
+}
+```
+==========================================================================================
+```cpp
+// op_kernel/abs_common.h
+/**
+ * @file abs_common.h
+ */
+#ifndef ABS_COMMON_H
+#define ABS_COMMON_H
+#include "kernel_operator.h"
+constexpr int32_t BUFFER_NUM = 2; // tensor num for each queue
+#endif // ABS_COMMON_H
+    ......
+```
+==========================================================================================
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+\end{tcolorbox}
+\vspace{-10pt}
+\captionof{table}{An example of an AbsMath kernel prompt for Ascend kernel generation, comprising four components: instruction text, test cases, NPU hardware configuration, and kernel source code.}
+\label{tab:prompt_project_file}
+\clearpage

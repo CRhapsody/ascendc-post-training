@@ -1,0 +1,35 @@
+\begin{table}[t]
+\centering
+\caption{Representative examples of errors in generated kernels, grouped by error type.}
+\label{tab:kernel_errors_full}
+\begin{tabular}{p{5cm} p{2cm} p{8cm}}
+\toprule
+\textbf{Error Type} & \textbf{Example} & \textbf{Description} \\
+\midrule
+\multirow{5}{*}{API Signature and Overloading} 
+& Equal & Muls: third argument LocalTensor<float> instead of scalar; Greater: function not declared; Mins: third argument minValLocal LocalTensor<float> instead of float; DataCopy: LocalTensor<float> vs GlobalTensor<half> type conflict; ReduceSum: missing required template parameter \texttt{pattern}. \\
+& Arange & Add: 4 arguments including float16 scalar, but all overloads require LocalTensor and more parameters; Duplicate: 3 arguments (LocalTensor, int, int) provided, but all overloads require 6 arguments or have type conflicts (unsigned int vs int). \\
+\midrule
+\multirow{2}{*}{Data Type and Casting} 
+& Equal & equal: float to bool conversion unsupported by CastIntrinsicsImpl; Duplicate: target yLocal type LocalTensor<bool> conflicts with template float; Sub: input tensors type inference conflict (bool vs float). \\
+& Less & Duplicate used with uint8\_t/bool, unsupported types; int16\_t to bool conversion missing CastIntrinsicsImpl overload. \\
+\midrule
+\multirow{2}{*}{Memory and Object Misuse} 
+& Icamax & TQue missing GetSize; undefined FLT\_MAX; undefined fabs; another TQue missing GetSize; DataCopy: parameter mismatch, expected (GlobalTensor, LocalTensor, int); Init: 4 arguments provided, 5 expected. \\
+& Isamax & Dereferencing uint64\_t from LocalTensor::GetPhyAddr(); DataCopy: reinterpret\_cast int32\_t* to \_\_gm\_\_ int32\_t* invalid. \\
+\midrule
+\multirow{2}{*}{Variable Scope and Lifetime} 
+& IsInf & Undeclared identifier 'IsInf'; Undeclared 'ToLocalTensor', likely meant 'LocalTensor', used in And function. \\
+& Ccopy & Undeclared 'complex64' in GlobalTensor/LocalTensor templates and sizeof; Undeclared 'c10', causing template instantiation and sizeof errors. \\
+\midrule
+\multirow{2}{*}{Syntax and Structural} 
+& Snrm2 & SyncAll() defined without parameters, called as template SyncAll<true>(); KernelSnrm2 missing member 'tailBlock'; tiling struct registration fails. \\
+& FastGeluGrad & Variable name starting with digit ('1\_702\_x'), invalid in C++. \\
+\midrule
+\multirow{2}{*}{Macro and Preprocessing} 
+& ClipByValue & TILING\_KEY\_IS macro misused; macro expansion may lack semicolon. \\
+& Sasum & 'ALIGN\_SIZE' ambiguous (user-defined 8 vs AscendC 32); DataCopyPad parameter mismatch; TBuf missing SetFlag member function. \\
+\bottomrule
+\end{tabular}
+\label{tab:error_examples}
+\end{table}

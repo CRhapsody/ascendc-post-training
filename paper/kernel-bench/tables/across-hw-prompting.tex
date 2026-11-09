@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{llcccl}
+\toprule
+\textbf{Level} & \textbf{GPUs} & \textbf{Llama-3.1-70b-Inst} & \textbf{DeepSeek-V3} & \textbf{DeepSeek-R1}  & \textbf{OpenAI-o1}\\
+\midrule
+\multirow{3}{*}{
+\textbf{1}}
+& \textbf{L40S} & 2\% & 5\% & 14\%  &13\%\\
+& \textbf{H100} & 3\% & 6\% & 14\%  &9\%\\
+& \textbf{A100} & 4\% & 4\% & 16\%  &9\%\\
+\midrule
+\multirow{3}{*}{
+\textbf{2}}
+& \textbf{L40S} & 1\% & 4\% & 33\%  &25\%\\
+& \textbf{H100} & 2\% & 2\% & 35\%  &33\%\\
+& \textbf{A100} & 2\% & 1\% & 31\%  &32\%\\
+\midrule
+\multirow{3}{*}{
+\textbf{3}}
+& \textbf{L40S} & 0\% & 2\% & 0\%  &10\%\\
+& \textbf{H100} & 2\% & 8\% & 0\%  &12\%\\
+& \textbf{A100} & 0\% & 0\% & 2\%  &8\%\\
+\bottomrule
+\end{tabular}
+
+\caption{Providing hardware specifications in context: Speedup (\fast{1}) over Torch Eager comparison of GPUs across different models and levels.}
+\label{tab:speedup-hardware-comparison-prompting}
+\end{table}

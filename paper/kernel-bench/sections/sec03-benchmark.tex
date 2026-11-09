@@ -1,0 +1,73 @@
+KernelBench is a new framework for evaluating the ability of language models to generate performant kernels for a breadth of AI workloads.  In this section, we describe the task format, contents, and evaluation metric. 
+
+\subsection{KernelBench Task Format}
+KernelBench contains 250 tasks representing a range of AI workloads, and is easily extensible to new workloads. The end-to-end specification for a task is illustrated in \autoref{fig:kernelbench-workflow} and described below. 
+\\\\
+\noindent \textbf{Task input:} Given an AI workload, the input to the task is a reference implementation written in PyTorch. Mimicking an AI researcher's workflow, the PyTorch code contains a class named \texttt{Model} derived from \texttt{torch.nn.Module()}, where the standard \texttt{\_\_init\_\_} and \texttt{forward()} functions (and any helper functions) are populated with the AI workload's PyTorch operations. 
+
+AI algorithms generally operate on large tensors of data. The optimal kernel for a workload depends on the size and data type (e.g., BF16, FP8) of the tensor. Therefore, each task additionally contains functions \texttt{get\_inputs()} and \texttt{get\_init\_inputs()}, which specify the exact input tensors that the kernel needs to handle.
+\\\\
+\noindent \textbf{Task output:} Given the input, the LM needs to output a new class named \texttt{ModelNew} derived from \texttt{torch.nn.Module()}, which contains custom optimizations. For example, the LM can incorporate in-line kernel calls during the \texttt{forward()} function using the CUDA-C extension in PyTorch.
+
+In order to succeed, the LM needs to identify (1) which operations in the \texttt{Model} class would benefit most from optimizations, and (2) how to optimize those operations. The LM can use any hardware-efficiency techniques such as fusion and tiling or specialized instructions (e.g., tensor cores) and any programming library (e.g., PTX, CUDA, CUTLASS, Triton, ThunderKittens).
+
+
+\subsection{Task Selection}
+The 250 tasks in KernelBench are partitioned into three levels, based on the number of primitive operations, or PyTorch library functions, they contain:
+% A primitive operation is equivalent to a PyTorch library function:
+\begin{itemize}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+    \item \textbf{Level 1 (100 tasks): Single primitive operation.} This level includes the foundational building blocks of AI (e.g. convolutions, matrix-vector and matrix-matrix multiplications, losses, activations, and layer normalizations). 
+
+    Since PyTorch makes calls to several well-optimized and often closed-source kernels under-the-hood, it can be challenging for LMs to outperform the baseline for these primitive operations. However, if an LM succeeds, the open-source kernels could be an impactful alternative to the closed-source (e.g., CuBLAS~\cite{nvidia2023cublas}) kernels.
+    
+    \item \textbf{Level 2 (100 tasks): Operator sequences.} This level includes AI workloads containing multiple primitive operations, which can be fused into a single kernel for  improved performance (e.g., a combination of a convolution, ReLU, and bias).
+
+    Since compiler-based tools such as the PyTorch compiler are effective at fusion, it can be challenging for LMs to outperform them. However, LMs may propose more complex algorithms compared to compiler rules. 
+
+    % To generate these problems, we programmatically combine random choices of mainloop operators (e.g., matmul, conv) with random choices of epilogue operators (e.g., activations, norms, reductions). 
+    % A script randomly selects one mainloop operator and 2–5 epilogue operators to create a specification, which is paired with a one-shot example for LLMs to generate PyTorch code.  On average, each problem contains 4 operations.
+    
+    \item \textbf{Level 3 (50 tasks): Full ML architectures.} This level includes architectures that power popular AI models, such as AlexNet and MiniGPT, collected from  popular PyTorch repositories on GitHub.
+    
+    Given the scale of modern models, it is critical to use kernels when running training and inference. Unfortunately, it has been difficult for the AI community to generate performant kernels. For instance, it took 5 years from the release of the Transformer architecture~\cite{vaswani2018attention} to obtain performant kernels~\cite{dao2022flashattention}, let alone today's many new architectures. Peak performance kernels for these architectures require algorithmic modifications that are often beyond the scope of a compiler. 
+    
+    % Level 3 includes a mix of LLM-generated well-known ML architectures (e.g., AlexNet) and real-world architectures like MiniGPT collected from the popular pytorch repositories on GitHub. These architectures have been cleaned up by removing extraneous details, such as argument parsers, training loops, dataset preprocessing, and non-essential components, leaving only the inference forward pass and necessary helper functions.
+\end{itemize}
+
+\noindent We reiterate that each task contains a meaningful set of AI primitive operations or architectures, such that LM success on the task can directly lead to real world impact.   
+
+% \textbf{Problem sources} The tasks in KernelBench are created through a mix of manual authoring, LLM or script generation, and collection from sources like GitHub, with all tasks manually cleaned and verified for quality. Common ML operators are manually curated and implemented for level 1. At Level 2, mainloop operators (e.g., matmul, conv) and epilogue operators (e.g., activations, norms, reductions) are combined programmatically. A script randomly selects one mainloop operator and 2–5 epilogue operators to create a specification, which is paired with a one-shot example for LLMs to generate PyTorch code. 
+
+
+% We also provide 20 additional tasks in an aspirational level 4. Unlike the previous levels where the tasks are self-contained, level 4 tasks call the Huggingface library such that optimizations will require changing the source code. Level 4 is currently a far-reaching objective, and we do not provide evaluations in this paper; however, we believe that this level could inform advancing the capabilities of LLMs to optimize complex real-world ML codebases. 
+
+\subsection{Metric Design} \label{sec-metric-design}
+
+We describe the evaluation approach for KernelBench and how we compare the success of different LMs. 
+
+\paragraph{Evaluation approach}
+KernelBench is an evaluation-only benchmark. We do not provide ground truth kernels for the tasks since we imagine users benchmarking on a variety of hardware platforms (including new platforms), input types, and workloads. However, by design, KernelBench is \textit{automatically verifiable}. Given a task, we randomly generate input tensors of the prescribed shape and precision and collect the PyTorch \texttt{Model} output. We can evaluate whether LM generations are correct and fast as follows:
+
+\begin{enumerate}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+    \item \textbf{Correctness} 
+    % We check whether the output of the forward-pass from \texttt{Model} matches \texttt{ModelNew}, given the tensors input shapes and data types defined in the task. 
+    We compare the \texttt{Model} output to the LM-generated \texttt{ModelNew} output. 
+    % This approach is sufficient because the benchmark focuses on specialized code for specific problems, rather than generalized solutions. Custom kernels are only required to pass the test cases for their respective problems. Since the deep learning kernels do not involve control flow or branch-specific execution paths, correctness can be determined by verifying the numerical outputs against the reference implementation. 
+    We evaluate on 5 random inputs per problem (detailed in Appendix~\ref{appendix:eval-methods-and-baselines}).
+    % shows that correctness is either consistently achieved for all cases or fails completely on randomized inputs. 
+    % This allows for a simple yet reliable mechanism to assess the functional accuracy of the generated kernels.
+    \item \textbf{Performance} We compare the wall-clock execution time of \texttt{Model} against \texttt{ModelNew} using repeated trials to account for timing variations. 
+    % We compare
+\end{enumerate}
+
+\paragraph{Comparing LMs on KernelBench}
+Some LMs may generate a small number of correct kernels that are very fast, while other LMs generate a large number of correct kernels that are quite slow. Here, we explain our proposed unified metric for ranking LM quality on KernelBench. 
+
+To capture both axes of correctness and performance, we introduce a new metric called \fast{p}, which is defined as the fraction of tasks that are both correct and have a speedup (computed as the ratio of PyTorch wall-clock time to generated kernel time) greater than threshold $p$. Formally:
+\begin{align*}
+\text{fast}_p = \frac{1}{N} \sum_{i=1}^N \mathbbm{1}(\text{correct}_i \land \left\{ \text{speedup}_i > p \right \}),
+\vspace{-.1in}
+\end{align*} 
+where \fast{0} is equivalent to the LM's correctness rate, as it measures the fraction of tasks for which the LM code is functionally correct regardless of its speed.
+
+By adjusting the threshold parameter $p$, we enable evaluation of kernel performance at different speedup thresholds and capture the speedup distributions. For our evaluations, we focus on $p=1$ as a starting point, with the possibility of increasing $p$ as future methods for kernel generation improve. Additionally, using $p<1$ for training is valuable, since PyTorch relies on complex optimized kernels, and matching even a fraction of their performance is still considered beneficial.

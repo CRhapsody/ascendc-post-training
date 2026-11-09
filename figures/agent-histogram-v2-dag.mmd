@@ -1,0 +1,46 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"wrappingWidth":340}}}%%
+flowchart TB
+    histContext["M3｜参考算子语义<br/>histc 计数后转 int32"]:::context
+    histInit["M9–34｜模板、Histc 参考<br/>读取并备份原始 14 例"]:::action
+    histSubset["M35–36｜写入 10 例子集<br/>保留 7 种 dtype"]:::action
+    histDesign["M47–52｜写 Block / Tile 设计<br/>以及 TileLang wrapper"]:::action
+    histAstFail["M53–62｜AST 检测失败<br/>动态导入未被识别"]:::failed
+    histAstPass["M67–71｜改成标准导入<br/>TileLang AST 通过"]:::passed
+    histTlSkip["M72｜跳过 TileLang 功能验证<br/>设计没有运行正确性证据"]:::uncertain
+    histKernel["M92–103｜写 AscendC 工程<br/>单核标量累加 histogram"]:::action
+    histAscAst["M104–106｜初版 wrapper<br/>AscendC AST 通过"]:::passed
+    histCtorFail["M107–111｜构建及安装完成<br/>模型初始化参数失败"]:::failed
+    histCtorFix["M118–119｜补初始化接口<br/>准备重新运行 verifier"]:::action
+    histMismatch["M120–126｜第二轮结果<br/>10 个 case 都有计数错误"]:::failed
+    histRangeFix["M129–130｜改边界语义<br/>跳过范围外元素"]:::action
+    histSubsetExit["M131–133｜修复后重测<br/>exit 0；逐例尾部未展开"]:::uncertain
+    histPerfFail["M134–145｜性能脚本重试<br/>hook 与初始化先后失败"]:::failed
+    histPerfFix["M148–154｜修 reference 初始化<br/>改 env 前缀后重跑"]:::action
+    histPerf["M156｜10 例性能报告<br/>overall 约 0.45 倍"]:::context
+    histRestore["M157–160｜恢复备份 14 例<br/>执行全量评测"]:::action
+    histPass["M162｜完整逐例结果<br/>14 / 14 matched"]:::passed
+    histSummary["M163–167｜读取精确值 0.4471<br/>记录完成声明，非性能下界"]:::uncertain
+    histContext --> histInit
+    histInit --> histSubset
+    histSubset --> histDesign
+    histDesign --> histAstFail
+    histAstFail --> histAstPass
+    histAstPass --> histTlSkip
+    histTlSkip --> histKernel
+    histKernel --> histAscAst
+    histAscAst --> histCtorFail
+    histCtorFail --> histCtorFix
+    histCtorFix --> histMismatch
+    histMismatch --> histRangeFix
+    histRangeFix --> histSubsetExit
+    histSubsetExit --> histPerfFail
+    histPerfFail --> histPerfFix
+    histPerfFix --> histPerf
+    histPerf --> histRestore
+    histRestore --> histPass
+    histPass --> histSummary
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:1.5px;
+    classDef passed fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.5px;
+    classDef failed fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.5px;
+    classDef context fill:#F1F5F9,stroke:#64748B,color:#0F172A,stroke-width:1.5px;
+    classDef uncertain fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:1.5px;

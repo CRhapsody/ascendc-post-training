@@ -1,0 +1,61 @@
+\section{Introduction}
+
+The rapid advancement of Artificial Intelligence (AI), particularly deep learning, has fundamentally reshaped modern computing architectures. To meet the ever-increasing demand for computational efficiency and throughput, domain-specific accelerators have emerged as a key solution. Among them, Neural Processing Units (NPUs), such as Huawei's Ascend platform~\cite{liao2021ascend, xue2024unlocking, wroblewski2025parallel}, play a critical role in contemporary AI infrastructure by providing high performance for deep learning workloads. However, the practical efficiency of these accelerators is determined not only by hardware capabilities, but also by the quality of the underlying compute kernels. As a result, developing high-performance, hardware-adapted kernels is a prerequisite for fully unlocking the potential of NPU platforms.
+
+Writing such kernels remains extremely challenging. NPU kernel development typically relies on highly specialized, vendor-specific domain-specific languages (DSLs), such as AscendC, which require developers to possess deep expertise in hardware architecture. This includes fine-grained management of hierarchical memory systems (e.g., global versus on-chip memory), carefully designed data tiling strategies, asynchronous pipeline programming for overlapping computation and data movement, and explicit utilization of vector (SIMD) and matrix (Cube) execution units. The resulting learning curve is steep, making manual kernel development time-consuming, costly, and error-prone. Consequently, kernel optimization has become a major bottleneck in the rapid iteration and deployment of AI applications on NPU architectures.
+
+At a higher level, this challenge exposes a fundamental limitation of current code generation approaches: general-purpose programming knowledge is insufficient for generating correct and efficient code in highly specialized, hardware-specific domains. Motivated by the success of Large Language Models (LLMs) in general-purpose code generation, both academia and industry have explored their use for automating kernel development. However, this approach faces a critical obstacle. The knowledge required for hardware-specific DSLs differs fundamentally from that of general-purpose programming languages, encompassing strict API constraints, architecture-dependent semantics, and performance-critical optimization patterns. Moreover, high-quality training data in this domain is extremely scarce, leaving general-purpose LLMs poorly equipped to handle such tasks.
+
+Our preliminary evaluation, summarized in Table~\ref{tab:zero_shot_perf}, confirms this limitation empirically. Even state-of-the-art general-purpose LLMs (e.g., Qwen 3) perform extremely poorly when generating AscendC kernels in a zero-shot setting. These models frequently hallucinate non-existent APIs (e.g., \texttt{AscendC::Softmax}) or severely misuse core hardware interfaces, leading to exceptionally high compilation failure rates. For complex L2/L3 kernels, the execution success rate drops to around 0\%, indicating that, without domain-specific adaptation, general-purpose LLMs are effectively unusable for non-trivial NPU kernel development.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Zero-shot performance of general-purpose LLMs on the NPUKernelBench benchmark.}
+  \label{tab:zero_shot_perf}
+  \begin{tabular}{llcc}
+    \toprule
+    \textbf{Model} & \textbf{Task Type} & \textbf{Compilation} & \textbf{Functional Correctness} \\
+     & & \textbf{Success Rate} & \textbf{(Post-Compilation)} \\
+    \midrule
+    \multirow{2}{*}{Qwen3-8B} & L1 (Simple) & 8.22\% & 1.08\% \\
+     & L2/L3 (Complex) & 1.39\% & 0.00\% \\ \hline
+     %\multirow{2}{*}{Qwen2.5-7B} & L1 (Simple) & 16.58\% & 1.89\% \\
+     %& L2/L3 (Complex) & 6.89\% & 0.11\% \\ \hline
+     \multirow{2}{*}{Qwen2.5-Coder-7B} & L1 (Simple) & 9.19\% & 0.47\% \\
+     & L2/L3 (Complex) & 0.40\% & 0.00\% \\ \hline
+     \multirow{2}{*}{Llama3.1-8B} & L1 (Simple) & 23.97\% & 0.69\% \\
+     & L2/L3 (Complex) & 19.44\% & 0.00\% \\ \hline
+     \multirow{2}{*}{Mistral-7B} & L1 (Simple) & 0.00\% & 0.00\% \\
+     & L2/L3 (Complex) & 0.00\% & 0.00\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+These observations suggest that enabling LLMs to generate high-quality NPU kernels requires two key advancements. First, the model must acquire a deep understanding of the hardware-specific programming paradigm, including API constraints and architectural characteristics. Second, a professional and reliable evaluation framework is necessary to rigorously assess not only compilation success, but also functional correctness and performance, which are all critical for kernel-level code.
+
+To address these challenges, we propose \textbf{AscendKernelGen}, a generation--evaluation integrated framework for NPU kernel development. Our contributions are threefold:
+
+\begin{enumerate}
+    \item \textbf{A Domain-Specific Reasoning Dataset for Kernel Generation.}
+    We construct and release \textit{Ascend-CoT}, a high-quality dataset designed to capture the structured reasoning processes required for low-level NPU kernel programming. The dataset is curated from real-world kernel implementations and includes detailed annotations that reflect pipeline construction, synchronization logic, and arithmetic reasoning patterns.
+
+    \item \textbf{Domain-Adaptive Post-Training for Low-Level Code Generation.}
+    Building on a strong base LLM, we introduce a domain-adaptive post-training strategy that explicitly targets the reasoning challenges of NPU kernel synthesis. The resulting model, \textit{KernelGen-LM}, demonstrates substantially improved compilation success and functional correctness compared to general-purpose code models.
+
+    \item \textbf{A Comprehensive Evaluation Benchmark for NPU Kernels.}
+    We design \textit{NPUKernelBench}, an evaluation framework that systematically assesses generated kernels along three dimensions: compilation success, functional correctness, and performance. Its dual-path evaluation design enables rigorous analysis of both static-shape optimization and dynamic-shape robustness, providing a reliable benchmark for future research on accelerator-aware code generation.
+\end{enumerate}
+
+Experimental results demonstrate the effectiveness of the proposed approach.
+After domain-adaptive post-training on the \texttt{Ascend-CoT} dataset, the model exhibits substantial improvements in kernel generation quality, particularly on complex kernels that are nearly unsolvable in zero-shot settings.
+Both compilation success and functional correctness improve consistently across difficulty levels, indicating that domain-specific reasoning supervision is crucial for bridging the gap between general-purpose LLMs and hardware-specific kernel programming.
+
+The remainder of this work is organized as follows.
+Section~\ref{sec:relatedworks} reviews prior research on LLM-based code generation, traditional hardware-specific kernel optimization and benchmarks for code generation.
+Section~\ref{sec:programming_constraints} introduces the programming abstractions and hardware constraints that characterize NPU kernel development.
+Section~\ref{sec:system_overview} presents an overview of the \texttt{AscendKernelGen} framework, covering both the kernel generation pipeline and the hardware-grounded evaluation workflow.
+Section~\ref{data_construct} describes the construction of the training data, including documentation-based CoT, code-centric CoT, and general CoT data.
+Section~\ref{fine_tune} details the domain-adaptive fine-tuning process for LLM-based NPU kernel generation.
+Section~\ref{NPUKernelBench} introduces \texttt{NPUKernelBench}, our evaluation benchmark for assessing compilation, correctness, and performance on real NPU hardware.
+Section~\ref{experiments} reports the experimental setup and provides an in-depth analysis of the empirical results.
+Finally, Section~\ref{conclusions} concludes the report and discusses directions for future work.

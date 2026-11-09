@@ -1,0 +1,100 @@
+% !htbp
+\begin{table}[t]
+  \centering
+  % ============================= Outer container (single prompt)
+  \begin{tcolorbox}[
+    rounded corners,
+    arc=3pt,
+    enhanced,
+    width=1\textwidth,
+    colframe=refpurple!15, % <----- CHANGED
+    coltitle=refpurple,
+    colback=white,
+    title=\textbf{Evaluation Criteria},
+    fonttitle=\bfseries\small,
+    boxrule=0.6pt,
+    left=2pt,
+    right=2pt,
+    top=0pt,
+    bottom=1pt
+  ]
+% --------------- Part 2: Previous CUDA implement with scores
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Default evaluation criteria}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-4pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python]
+def check_precision(outputs, outputs_new, max_abs_error, max_rel_error):
+    # outputs: list of tensors from reference model
+    # outputs_new: list of tensors from LLM generated kernel
+    outputs = [outputs] if not isinstance(outputs, list) else outputs
+    outputs_new = [outputs_new] if not isinstance(outputs_new, list) else outputs_new
+    
+    all_abs_diff, all_rel_diff = [], []
+    is_accurate = True
+    
+    # Process each output pair
+    for out, out_new in zip(outputs, outputs_new):
+      abs_diff = torch.abs(out - out_new)
+      rel_diff = abs_diff / (torch.abs(out) + 1e-7) # Add epsilon to avoid division by zero
+      all_abs_diff.append(abs_diff.view(-1))
+      all_rel_diff.append(rel_diff.view(-1))
+    
+      # Check if any element exceeds both absolute and relative error thresholds
+      if ((abs_diff > max_abs_error) & (rel_diff > max_rel_error)).any():
+          is_accurate = False
+    
+    # Combine all differences
+    all_abs_diff = torch.cat(all_abs_diff)
+    all_rel_diff = torch.cat(all_rel_diff)
+    
+    return (1 if is_accurate else 0), all_abs_diff, all_rel_diff
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Custom evaluation criteria}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-5pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python,upquote=true]
+def custom_check_precision(param, outputs, outputs_new):
+    dtype_str = param.get(`dtype`, `float16`)
+    dtype = getattr(torch, dtype_str)
+    if dtype == torch.float32:
+        return check_precision(outputs, outputs_new, max_abs_error=0.00001, max_rel_error=0.00001)
+    else:
+        return check_precision(outputs, outputs_new, max_abs_error=0.001, max_rel_error=0.001)
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+\end{tcolorbox}
+\vspace{-10pt}
+\caption{Correctness evaluation criteria for LLM-generated kernels, covering both default and custom methods.}
+\label{tab:kernel_correctness}
+\end{table}
+
+
+

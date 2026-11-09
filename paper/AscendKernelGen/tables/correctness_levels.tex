@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{Scoring criteria for kernel evaluation.}
+\resizebox{1\linewidth}{!}{
+\begin{tabular}{lll}
+\hline
+\textbf{Scoring Item} & \textbf{Formula} & \textbf{Core Idea} \\
+\hline
+Task Score & $ \text{Score}_{\text{task}} = \frac{\text{Number of Passed Test Cases}}{\text{Total Number of Test Cases}} \times 100 $ & Measures correctness and serves as the foundation of the overall score. \\
+Level Score & $ \text{Average}(\text{Score}_{\text{task}_j}) $ & Reflects the overall performance at a given difficulty level. \\
+Total Score & $ \sum (\text{Score}_{\text{level}} \times w_{\text{level}}) $ & Weighted sum incentivizing completion of higher-difficulty tasks. \\
+\hline
+\end{tabular}}
+\label{tab:level_correctness}
+\end{table}

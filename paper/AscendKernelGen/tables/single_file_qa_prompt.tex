@@ -1,0 +1,68 @@
+\begin{wraptable}{l}{0.5\textwidth}
+\vspace{-20pt}
+\centering
+\begin{tcolorbox}[
+    sharp corners,
+      colframe=reforange,
+      colback=reforange!5,
+      colbacktitle=reforange!15,
+      coltitle=reforange,
+      boxrule=0.4pt,
+      title={\textbf{Prompt for generating question}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+]
+{\small
+You are an expert in AscendC programming for the Huawei Ascend processor. Based on the provided answer code, please generate a corresponding request for that code.
+
+\textbf{Background:} 
+
+I maintain an AscendC operator repository that contains many operators, and each operator consists of multiple code files. I am constructing a dataset to train an LLM that can assist in writing AscendC operators. Each file within an operator will serve as a single training sample. I already have the answer code for each sample, but I still need to generate the corresponding request. After I provide you with a piece of answer code, your task is to analyze the code, understand and summarize its purpose, and then generate a request such that the provided code naturally serves as a correct response to that request. The request should be high-level and concise rather than overly detailed.
+
+Please output the request in the following format:
+
+\verb|<request>REQUEST_TEXT</request>| 
+
+Note: Output only the final request—no reasoning process.
+
+\textbf{Requirements:}
+
+1. The request must capture the core functionality and purpose of the code.
+
+2. The request should be clear and concise, avoiding unnecessary complexity.
+
+The answer code is provided below:
+
+[ ... Kernel code ... ]
+
+}
+\end{tcolorbox}
+% \begin{tcolorbox}[
+%     sharp corners,
+%       colframe=reforange,
+%       colback=reforange!5,
+%       colbacktitle=reforange!15,
+%       coltitle=reforange,
+%       boxrule=0.4pt,
+%       title={\textbf{Generated question samples}},
+%       fonttitle=\bfseries\small,
+%       left=0.5pt,
+%       right=0.5pt,
+%       top=0.5pt,
+%       bottom=0.5pt
+% ]
+% {\small
+% <request> Please create an interface header file for the Sigmoid operator that includes the required header references, uses the AscendC namespace, and provides a deprecation notice pointing to the new sigmoid.h file. </request>
+
+% <request> Please implement an AscendC operator header file that defines the computation interface for the Swish activation function. The activation is defined as swish$(x) = x / (1 + e^{(-βx)})$, and it should support both half and float data types. </request>
+% }
+% \end{tcolorbox}
+\vspace{-15pt}
+\captionof{table}{Prompt for generating question.}
+\label{tab:prompt_single_file_qa}
+\vspace{-100pt}
+\end{wraptable}
+

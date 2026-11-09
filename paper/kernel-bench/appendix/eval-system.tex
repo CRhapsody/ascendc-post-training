@@ -1,0 +1,41 @@
+\subsection{Single-shot Experiments: Batched Kernel Generation}
+Given the high volume of GPU kernels to evaluate, we build a fast and highly-parallelized evaluation system, where we separate into the kernel generation and evaluation process into 3 stages, as shown in Figure~\ref{fig:parallel-eval-system}.
+\begin{itemize}
+    \item \textbf{Inference:} We query LMs in parallel and store the generated kernel.
+    \item \textbf{CPU Pre-Compile:} We compile the model-generated kernels with \texttt{nvcc} for a specified hardware into a binary, parallelized on CPUs and each kernel binary is saved to their individual specific directory for caching. 
+    \item \textbf{GPU Evaluation:} With the kernel binary already built on CPU, we focus on evaluating multiple kernels in parallel across multiple GPU devices. However, to ensure accurate kernel timing, we only evaluate one kernel at time on one device. 
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/parallel-eval.png}
+    \caption{\textbf{KernelBench provide a high throughput kernel generation and evaluation system}. We parallelized generation, compilation, and evaluation of kernels across CPUs and GPUs.}
+    \label{fig:parallel-eval-system}
+\end{figure}
+
+\subsection{Iterative Refinement Experiments: GPU Orchestrator System}
+
+Based on the single-shot system, we also design a platform to handle multiple iterative refinement experiments at once. We treat each iterative refinement experiment as a finite state machine, where the states are LM-based kernel generation, pre-compilation, kernel execution, and profiling. The transitions are based on environment feedback, and can change based on different experiment setups.
+
+Our system was run on a node with $8$ available GPUs. Unlike the single-shot system, batching each generation and kernel execution is highly inefficient -- thus, we design a pipelined, multiprocessing system with a GPU orchestrator with the following characteristics:
+
+\begin{itemize}
+    \item \textbf{CPU Parallelism:} The orchestrator spawns multiple independent processes that each handle an independent task in KernelBench. These processes run the multi-turn state machine logic for the iterative refinement experiments -- only the kernel execution state requires acquiring a GPU.
+    \item \textbf{Acquiring GPUs:} The GPU orchestrator keeps a separate process running that handles which processes can acquire a GPU using semaphores. Processes can request a GPU from this process when it is ready to execute and evaluate kernel code. We try to minimize process control over a GPU to maximize resource throughput, given a system with a limited number of available GPUs.
+    \item \textbf{Pre-compiling on the CPU:} To avoid processes hogging GPU time, we pre-compile kernels with \texttt{nvcc} on the CPU for a specified hardware into a binary. We also did this same trick for the single-shot system, but for separate reasons.
+    \item \textbf{Evaluating Kernels on the GPU:} The only state where the finite state machine uses the GPU is for kernel execution and profiling. We found that waiting on GPUs is the primary bottleneck in the orchestrator, so we designed the orchestrator to maximize device occupancy.
+\end{itemize}
+
+\noindent The system generally supports overlapping the generation of kernel code and the execution of already-generated kernel code. There are also several unavoidable errors such as CUDA illegal memory accesses and deadlocks due to faulty kernel generations that the orchestrator solves by releasing and spawning new processes when encountered, and we wrote specifically handlers to ensure these errors are properly captured without crashing the orchestrator itself.
+
+\subsection{UI: Visualizing Kernel Generation Trajectories}
+
+To qualitatively observe the generated and compare them across techniques, we design an interface to easily visualize them. We provide this as part of the KernelBench framework. 
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/kernel_inspect_interface.png}
+    \caption{\textbf{We provide a visual interface for kernel inspection}. This allows us to easily examine kernel content, its performance, and compare across various techniques and configurations.}
+    \label{fig:kernel_inspect}
+\end{figure}

@@ -1,0 +1,76 @@
+\begin{table*}[ht]
+\vspace{-2mm}
+\centering
+\setlength{\tabcolsep}{2pt} % Reduce column spacing
+{\small % Only the table content is affected
+
+\begin{tabular}{l|ccc|ccc|ccc}
+\toprule
+\multirow{3}{*}{\textbf{Method}} & \multicolumn{3}{c|}{\textbf{Level 1}} & \multicolumn{3}{c|}{\textbf{Level 2}} & \multicolumn{3}{c}{\textbf{Level 3}} \\
+ & \scriptsize{Llama-3.1} & \scriptsize{DeepSeek} & \scriptsize{Deepseek} & \scriptsize{Llama-3.1} &  \scriptsize{Deepseek} &  \scriptsize{Deepseek} &  \scriptsize{Llama-3.1} &  \scriptsize{Deepseek} &  \scriptsize{Deepseek} \\
+ & \small{70B} & \small{V3} & \small{R1} & \small{70B} & \small{V3} & \small{R1} & \small{70B} & \small{V3} & \small{R1} \\
+\midrule
+Single Attempt (Baseline) & 3\% & 6\% & 12\% & 0\% & 4\% & 36\% & 0\% & 8\% & 2\% \\
+\midrule
+Repeated Sampling (@10) & 5\% & 11\% & N/A & 3\% & \textbf{14\%} & N/A & 1\% & 14\% & N/A \\
+\midrule
+Iterative Refinement w G & \textbf{9\%} & 9\% & 18\% & 0\% & 7\% & 44\% & 0\% & 14\% & 4\% \\
+Iterative Refinement w G+E & 5\% & 13\% & 41\% & \textbf{5\%} & 5\% & 62\% & \textbf{8\%} & \textbf{22\%} & 12\% \\
+Iterative Refinement w G+E+P & 7\% & \textbf{19\%} & \textbf{43\%} & 4\% & 6\% & \textbf{72\%} & 2\% & 14\% & \textbf{18\%} \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Both repeated sampling and iterative improvement enable models to generate more correct and fast kernels compared to baseline:} Here we present the percentage of problems where the LM-generated kernel is correct and faster than baseline Torch Eager ($\text{Fast}_1$ in \%) for the two test-time methods, both with the same sample budget of $10$ calls. We further compare performance within iterative refinement achieved when leveraging previous Generation $G$, Execution Result $E$, and Timing Profiles $P$. Note we do not repeatedly sample DeepSeek R1, as its API endpoint does not provide a temperature parameter.}
+\vspace{-2mm}
+\label{table:speedup-method-comparison}
+\end{table*}
+
+
+
+% \begin{table*}[ht]
+% \centering
+% \begin{tabular}{lllccc}
+% \toprule
+% \textbf{Level} & \textbf{Approach} & \textbf{Configuration}& \textbf{Llama 3.1-70B} & \textbf{Deepseek-V3} & \textbf{Deepseek-R1} \\
+% \midrule
+% \multirow{6}{*}{\textbf{1}} & \textbf{Single Attempt} 
+% &Baseline & 3\% & 6\% & 12\% \\
+%  % &  &Few-Shot Ex. & 6\% & \todo{XX}  & \todo{XX}  \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Repeated Sampling} 
+% & Best @10 & 5\% & 11\% & N/A \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Iterative Refinement}
+% & Last turn G & \textbf{9}\% & 9\% & 18\% \\
+%  &   (10 turns) & Last turn G w. E & 5\% & 13\% & 41\% \\
+%  &  &Last turn G w. E, P & 7\% & \textbf{19}\% & \textbf{43}\% \\
+% \midrule
+% \multirow{6}{*}{\textbf{2}} & \textbf{Single Attempt} 
+% &Baseline & 0\% & 4\% & 36\% \\
+%  % &  &Few-Shot Ex. & 0\%& \todo{XX}  & \todo{XX}  \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Repeated Sampling} 
+% & Best @10 & 3\% & \textbf{14}\% & N/A \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Iterative Refinement}
+% & Last turn G & 0\% & 7\% & 44\% \\
+%  &  (10 turns) &Last turn G w. E & \textbf{5}\% & 5\% & 62\% \\
+%  &  &Last turn G w. E, P & 4\% & 6\% & \textbf{72}\% \\
+% \midrule
+% \multirow{6}{*}{\textbf{3}} & \textbf{Single Attempt} 
+% &Baseline & 0\% & 8\% & 2\% \\
+%  % &  &Few-Shot Ex. & 0\%& \todo{XX}  & \todo{XX}  \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Repeated Sampling} 
+% & Best @10 & 1\% & 14\% & N/A \\
+% \cmidrule(lr){2-6}
+%  & \textbf{Iterative Refinement}
+% & Last turn G & 0\% & 14\% & 4\% \\
+%  &  (10 turns) &Last turn G w. E & \textbf{8}\% & \textbf{22}\% & 12\% \\
+%  &  &Last turn G w. E, P & 2\% & 14\% & \textbf{18}\% \\
+% \bottomrule
+% \end{tabular}
+
+% Note let's just take out prompting
+
+

@@ -1,0 +1,60 @@
+%%%%%% Hyena Macros
+\usepackage{amsmath,amssymb,amsthm,amsfonts,latexsym,bbm,xspace,graphicx,float,mathtools,mathdots, multirow, multicol}
+
+
+
+%%%%%%%%% Primitives
+\newcommand{\oneDConv}{\texttt{1DConv}}
+
+
+%%%%%%%%%%%%%% Parameters
+\newcommand{\inputLength}{N}
+\newcommand{\tupleLength}{N}
+\newcommand{\layer}{L}
+\newcommand{\layerIndex}{\ell}
+\newcommand{\modelDim}{d}
+\newcommand{\stateDim}{\overline{d}}
+\newcommand{\depth}{L}
+\newcommand{\hyenaLayerIndex}{\ell}
+\newcommand{\headDim}{d}
+\newcommand{\innerD}{\tilde{\headDim}}
+\newcommand{\innerN}{\tilde{\inputLength}}
+\newcommand{\innerDim}{(\innerN,\innerD)}
+\newcommand{\featureDim}{\headDim'}
+\newcommand{\circuitDegree}{\Delta}
+
+%%%%%%%%%%%%% Hidden Layers
+
+\newcommand{\modelInput}{\bm{u}}
+\newcommand{\inputDim}{\inputLength \times \headDim}
+
+%%%%%%%%%%%% Algorithms
+
+%\newcommand{\parens}[1]{\left #1 \right)}
+\newcommand{\modelTuple}[6]{\paren{#1,#2,#3,#4,#5}- \text{#6}}
+\newcommand{\hyenaTuple}[5]{\modelTuple{#1}{#2}{#3}{#4}{#5}{Hyena}}
+\newcommand{\coyoteTuple}[5]{\modelTuple{#1}{#2}{#3}{#4}{#5}{\BaseConv}}
+
+\newcommand{\hyenaTupleN}{\hyenaTuple{\inputLength}{\hyenaDepth}{\headDim}{\inputLength}{(\hyenaDepth+1)\headDim}}
+\newcommand{\coyoteTupleN}{\coyoteTuple{\inputLength}{\hyenaDepth}{\headDim}{\innerN}{\innerD}}
+
+
+
+\newcommand{\Hyena}[2]{\texttt{Hyena}\paren{{#1, #2}}}
+\newcommand{\Projection}[1]{\texttt{Projection}\paren{{#1}}}
+\newcommand{\ProjectionN}{\texttt{Projection}}
+\newcommand{\Linear}[1]{\texttt{Linear}_{#1}}
+\newcommand{\SSM}{\texttt{SSM}}
+
+
+%%%%%%% BaseConv Macros %%%
+\newcommand{\BaseConv}{\texttt{BaseConv}}
+\newcommand{\LinAtt}{\texttt{LinearAttention}}
+\newcommand{\Based}{\texttt{Based}}
+\newcommand{\Mamba}{\texttt{Mamba}}
+
+\newcommand{\Task}{\mathrm{MQAR}}
+\newcommand{\EQ}{\mathrm{EQ}}
+
+\newcommand{\squareMat}[1]{#1 \circ #1}
+\newcommand{\concatMat}[1]{\overline{#1}}

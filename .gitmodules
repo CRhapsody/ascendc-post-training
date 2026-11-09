@@ -1,0 +1,24 @@
+[submodule "ascendc-rl-datasets"]
+	path = ascendc-rl-datasets
+	url = https://github.com/jxliu1216/ascendc-rl-datasets.git
+	branch = main
+[submodule "vime"]
+	path = vime
+	url = https://github.com/BryanChen408/vime.git
+	branch = a3-pd
+[submodule "ProRL-Agent-Server"]
+	path = ProRL-Agent-Server
+	url = https://github.com/BryanChen408/ProRL-Agent-Server.git
+	branch = feat/ascendc-rl-t2a
+[submodule "cannbot-skills"]
+	path = cannbot-skills
+	url = https://gitcode.com/cann/cannbot-skills.git
+	branch = master
+[submodule "ascendc-kernelgen-data"]
+	path = ascendc-kernelgen-data
+	url = https://gitcode.com/Ascend/ascendc-kernelgen-data.git
+	branch = master
+[submodule "cudaLLM"]
+	path = cudaLLM
+	url = https://github.com/ByteDance-Seed/cudaLLM.git
+	branch = main

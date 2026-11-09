@@ -1,0 +1,47 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial, sans-serif","fontSize":"18px","lineColor":"#475569"},"flowchart":{"curve":"linear","nodeSpacing":28,"rankSpacing":30,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M2–4 读取参考算子<br/>交错重排与旋转位置编码"]
+    cases["M7–30 初始化并备份<br/>12 例精简为 9 例"]
+    design["M31–56 读取技能并写设计<br/>TileLang 与 Python 封装"]
+    astFailure["M57–59 TileLang AST 失败<br/>未识别 kernel 导入"]
+    importFix["M60–68 检查规则并修改<br/>改为指定的导入形式"]
+    astPass["M71–74 TileLang AST 通过<br/>声明跳过功能验证"]
+    code["M77–108 重排映射修正<br/>写 AscendC，AST 通过"]
+    jsonFailure["M109–113 构建后验证失败<br/>缺少 InterleaveRope.json"]
+    jsonFix["M114–115 复制 case 文件<br/>补齐参考期望的文件名"]
+    initFailure["M116–120 重测仍失败<br/>构造器收到 9 个多余参数"]
+    initFix["M121–136 核对验证器<br/>候选初始化参数改为 []"]
+    ninePass["M137–141 重测 通过<br/>9/9 case matched"]
+    perfFailure["M145–147 性能脚本报错<br/>双方构造器参数不兼容"]
+    perfFix["M148–161 核对性能器<br/>参考初始化参数改为 []"]
+    performance["M162–166 取得 9 例性能<br/>日志报逐例均值 1.18x"]
+    restore["M167–170 恢复备份<br/>文件重新包含 12 例"]
+    fullPass["M171–175 全量重测 通过<br/>12/12 case matched"]
+    declaration["M179–183 读报告并总结<br/>声明 0.61x 与 1.18x 两口径"]
+    reference --> cases
+    cases --> design
+    design --> astFailure
+    astFailure --> importFix
+    importFix --> astPass
+    astPass --> code
+    code --> jsonFailure
+    jsonFailure --> jsonFix
+    jsonFix --> initFailure
+    initFailure --> initFix
+    initFix --> ninePass
+    ninePass --> perfFailure
+    perfFailure --> perfFix
+    perfFix --> performance
+    performance --> restore
+    restore --> fullPass
+    fullPass --> declaration
+    classDef action fill:#dbeafe,stroke:#3b82f6,color:#0f172a;
+    classDef pass fill:#dcfce7,stroke:#16a34a,color:#0f172a;
+    classDef fail fill:#fee2e2,stroke:#dc2626,color:#0f172a;
+    classDef context fill:#f1f5f9,stroke:#94a3b8,color:#0f172a;
+    classDef limited fill:#fef3c7,stroke:#d97706,color:#0f172a;
+    class cases,design,importFix,code,jsonFix,initFix,perfFix,restore action;
+    class astPass,ninePass,fullPass pass;
+    class astFailure,jsonFailure,initFailure,perfFailure fail;
+    class reference context;
+    class performance,declaration limited;

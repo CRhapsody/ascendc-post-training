@@ -1,0 +1,62 @@
+\begin{algorithm}[t]
+\caption{Workflow for Constructing Ascend C API Correction SFT Data}
+\label{alg:api_sft_pipeline}
+
+\KwIn{
+  Raw build logs; \\
+  Source-code repository; \\
+  OCR-extracted API documentation
+}
+\KwOut{SFT dataset with reasoning and corrected API usage}
+
+% ----------- Step 1 -----------
+\textbf{Step 1: Extract Error Logs} \\
+\Begin{
+  Traverse all build logs; \\
+  \ForEach{log file}{
+    \If{contains error messages}{
+      Extract the error block and save it as a clean error sample;
+    }
+  }
+}
+
+\vspace{1mm}
+
+% ----------- Step 2 / Step 3.0 -----------
+\textbf{Step 2: Error Distribution Analysis} \\
+\Begin{
+  Classify error types using an LLM; \\
+  Compute pass/fail statistics to identify challenging operators; \\
+  Optionally filter easy cases using the statistics.
+}
+
+\vspace{1mm}
+
+% ----------- Step 3.1 -----------
+\textbf{Step 3: Contextual Diagnostic Report Generation} \\
+\Begin{
+  \ForEach{error sample}{
+    Retrieve related code snippet and variable definitions; \\
+    Retrieve the corresponding API documentation; \\
+    Merge log excerpt, code context, and API reference into a structured Markdown report;
+  }
+}
+
+\vspace{1mm}
+
+% ----------- Step 4 -----------
+\textbf{Step 4: SFT Data Synthesis} \\
+\Begin{
+  \ForEach{diagnostic report}{
+    Prompt an LLM to: \\
+    \Indp analyze the misuse of the API; \\
+    produce expert reasoning (\texttt{<think>}); \\
+    propose corrected usage and explanations; \Indm \\
+    Save the result as an SFT training instance;
+  }
+
+  Apply data balancing via subsampling or augmentation; \\
+  Remove low-quality or incomplete samples.
+}
+
+\end{algorithm}

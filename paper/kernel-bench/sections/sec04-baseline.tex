@@ -1,0 +1,81 @@
+\label{sec-4:baseline}
+In this section, we investigate how a range of LMs perform when evaluated off-the-shelf on KernelBench and explore their capabilities and failure modes.
+
+\subsection{One-shot Baseline} \label{4.1}
+
+We evaluate LMs using a prompt that contains one example of a PyTorch \texttt{Model} input and \texttt{ModelNew} output, highlighting the task format. The example is simple, containing only an \texttt{add} operator
+% and an output performing the \texttt{add} in CUDA 
+(See Appendix \ref{appendix:one-shot-baseline-prompts}). Given this in-context example and the PyTorch task \texttt{Model} to optimize, the LM generates \texttt{ModelNew} via greedy decoding. We profile the generated code on an NVIDIA L40S GPU, and measure the \fast{p} metric across all problems. Table \ref{table:greedy-baseline} shows that the LM-generated kernels achieves a speedup over PyTorch Eager in fewer than 20\% of tasks on average. 
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \setlength{\tabcolsep}{2pt} % Reduce space in table
+        \begin{tabular}{lccc|ccc}
+           \toprule
+            $\textbf{\fast{1}}$ over: & \multicolumn{3}{c}{PyTorch Eager} & \multicolumn{3}{c}{torch.compile} \\ 
+            \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+            KernelBench Level & 1 & 2 & 3 & 1 & 2 & 3 \\ 
+            \midrule
+            \small{GPT-4o}              & 4\%  & 5\%  & 0\%  & 18\% & 4\%  & \textbf{4\%} \\
+            \small{OpenAI o1}           & \underline{10}\% & \underline{24}\% & \textbf{12\%} & 28\% & \underline{19}\% & \textbf{4\%} \\
+            \small{DeepSeek V3}         & 6\%  & 4\%  & \underline{8}\%  & 20\% & 2\%  & \underline{2}\%  \\
+            \small{DeepSeek R1}         & \textbf{12\%} & \textbf{36\%} & 2\% & \textbf{38\%} & \textbf{37\%} & \underline{2}\%  \\
+            \small{Claude 3.5 Sonnet}   & \underline{10}\% & 7\%  & 2\%  & \underline{29}\% & 2\%  & \underline{2}\%  \\
+            \small{Llama 3.1-70B Inst.} & 3\%  & 0\%  & 0\%  & 11\% & 0\%  & 0\%  \\
+            \small{Llama 3.1-405B Inst.}& 3\%  & 0\%  & 2\%  & 16\% & 0\%  & 0\%  \\
+        \bottomrule
+
+        \end{tabular}
+        \vspace{3pt} % Adds a little spacing before the caption
+        \captionsetup{type=table} % Ensures caption works inside minipage
+        \caption{\textbf{KernelBench is a challenging benchmark for current LMs}. Here we present \fast{1}, i.e. the percentage of problems where the model-generated kernel is faster than the PyTorch Eager and \texttt{torch.compile} baseline (default configuration) on NVIDIA L40S.}
+        \label{table:greedy-baseline}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/error_breakdown.png} % Adjust width for wrapping
+        \caption{\textbf{We categorize failure modes of kernel code into execution failure and functional correctness}. For the one-shot baseline, reasoning models generate fewer kernels with execution failures, but all models struggle similarly with functional correctness.}
+        \label{fig:error-breakdown}
+    \end{minipage}
+    
+\end{figure}
+
+\footnotetext{The \texttt{torch.compile} baseline runtime is sometimes slower than Torch Eager -- this is due to reproducible runtime overhead (\textit{not compile time}) that could be significant for small kernels in Level 1. We focus on PyTorch Eager for the rest of our analysis, but we elaborate on other baselines in Appendix~\ref{appendix:eval-methods-and-baselines}.}
+
+\subsection{Correctness: Error Analysis} \label{sec-4.2-correctness}
+    
+In Figure \ref{fig:error-breakdown}, we analyze the failure modes of LMs across problems. It can be seen that a large proportion of model-generated kernels are incorrect. To better understand where model-generated kernels fail, we break down their correctness issues into execution failures (CUDA/\texttt{nvcc} / Python compile-time errors, CUDA memory violations, and runtime errors) and correctness errors (output tensor shape and value mismatches). We observe that the reasoning LMs (o1, R1) produce fewer incorrect solutions ($<55\%$) than other models ($>70\%$). However, we find this is mainly because they make fewer execution failures. All LMs struggle with functional correctness to a similar degree.
+
+\vspace{-2mm}
+\subsection{Performance: Speedup Distribution} 
+A key point of interest is whether the functionally correct LM-generated kernels outperform the PyTorch baseline. Figure~\ref{fig-greedy-fastp} shows the distribution of \fast{p} as $p$ varies, indicating the percentage of kernels that are $p$-times faster than the PyTorch Eager baseline (the top right of the plot is better). At $p=1$, fewer than 15\% of LM-generated kernels outperform PyTorch across all KernelBench levels. Reasoning-based LMs generally outperform the other LMs in providing speedups.
+
+\begin{figure*}
+\begin{center}
+\vspace{-10pt}
+\centerline{\includegraphics[width=\textwidth]{figures/greedy_fastp.png}}
+\caption{\textbf{Most LM-generated kernels are slow.} This figure shows the distribution of the \fast{p} metric as the speedup threshold $p$ (over PyTorch baseline) increases. \fast{0} represents the number of \textit{correct} kernels regardless of speed, and \fast{1} represents the number of correct kernels achieving at least $> 1\times$ speedup over PyTorch. Increasing the threshold $p$ increases the difficulty.
+% as difficulty increases.
+% \todo{say something more insightful}
+}
+\vspace{-20pt}
+\label{fig-greedy-fastp}
+\end{center}
+\end{figure*}
+
+% \vspace{-1mm}
+
+
+% (see Appendix \ref{appendix:one-shot-baseline-speedup} for examples). 
+
+\vspace{-2mm}
+\subsection{Performance Variations across Hardware}
+\label{section:perf-across-hardware}
+Our one-shot baseline makes no assumptions about the underlying hardware, so a natural question is how our analysis of the LM-generated kernels generalizes across various GPU types. Table \ref{tab:speedup-hardware-comparison} and Figure \ref{fig:r1_eager_level1_hw} show that kernels outperforming PyTorch Eager on NVIDIA L40S in Level 1 achieve similar speedups versus the baselines on other GPUs. However, on problems in Level 2, LMs exhibit larger variations in speedups  across GPUs (Figure \ref{fig:r1_eager_level2_hw}): DeepSeek R1-generated kernels achieve a \fast{1} of 36\% on NVIDIA L40S but 47\% on NVIDIA A10G for Level 2. This suggests that one-shot LM-generated kernels may not generalize well across hardware.
+% , especially as the optimization complexity increases from having a larger optimization space. 
+To generate target-specific kernels, we explore in Section \ref{subsection:hardware-info-case-study} whether providing hardware-specific details in-context could help.
+
+Our analysis reveals that the best models available today struggle to generate correct kernels that outperform the baseline PyTorch speeds. LM-generated kernels frequently fail due to simple compiler and run-time errors. Furthermore, it is difficult for LMs to write kernels that perform well across hardware platforms given simple instructions.

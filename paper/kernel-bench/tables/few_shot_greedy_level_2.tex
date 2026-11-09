@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\label{tab:few_shot_kernel_fusion_results_level2}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Problem Name} & \textbf{Baseline (ms)} & \textbf{Few-Shot (ms)} & \textbf{Ref Torch (ms)} \\
+\midrule
+Conv2d InstanceNorm Divide & 0.514 & 0.0823 & 0.0898 \\
+Gemm GroupNorm Swish Multiply Swish & 0.124 & 0.0542 & 0.0891 \\
+Matmul Min Subtract & 0.0651 & 0.0342 & 0.0397 \\
+Matmul GroupNorm LeakyReLU Sum & 0.0935 & 0.0504 & 0.072 \\
+ConvTranspose3d Swish GroupNorm HardSwish & 33.3 & 29.6 & 35.2 \\
+ConvTranspose2d Mish Add Hardtanh Scaling & 0.235 & 0.209 & 0.243 \\
+ConvTranspose3d Add HardSwish & 15.6 & 14.1 & 22.2 \\
+ConvTranspose2d Add Min GELU Multiply & 0.365 & 0.349 & 0.4 \\
+ConvTranspose2d BiasAdd Clamp Scaling Clamp... & 0.3 & 0.31 & 0.368 \\
+Conv2d GroupNorm Tanh HardSwish ResidualAdd... & 0.124 & 0.129	& 0.154 \\
+Conv2d ReLU HardSwish & 0.0681 & 0.0711 & 0.0768 \\
+\bottomrule
+\end{tabular}
+\caption{Performance comparison of the Section \ref{4.1} baseline and few-shot prompting in level 2 for problems whose few-shot kernels outperform PyTorch Eager.}
+\end{table}

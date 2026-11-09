@@ -1,0 +1,30 @@
+\label{sec-6:discussion}
+% In this section, we discuss qualitative examples of LM generations, and discuss opportunities for improvement. 
+
+\vspace{-2mm}
+\subsection{Deep Dive Into Interesting Kernels} \label{section: discussion-interesting-kernel}
+Here, we discuss a few surprising LM-generated kernels that demonstrate significant speedups over the PyTorch baseline. See detailed examples in Appendix \ref{appendix:kernel-case-study}.
+\\\\
+\noindent \textbf{Operator fusion} GPUs have small amounts of fast-access memory and large amounts of slow-access memory. Fusion can help reduce slow-access I/O costs by performing multiple operations on data that has been loaded into fast-access memory.
+% can reduces I/O costs by eliminating intermediate writes and reads, keeping computations in faster on-chip memory.  
+We find that LMs optimize the GELU (2.9x) and Softsign (1.3x) operators by fusing their computations into a single kernel. LMs generated a kernel that fuses multiple foundational operators -- matrix multiplication with division, summation, and scaling -- giving a 2.6x speedup. Overall, LMs leave  many fusion opportunities on the table.
+% is, however, a lot more opportunities for fusion (most level 2 problems) that the model is not currently doing.
+\\\\
+\noindent \textbf{Memory hierarchy} Effective kernels explicitly manage utilization of the limited amounts of shared and register memory. In the generated kernels, we found kernels that uses GPU shared memory -- cosine similarity (2.8x) and triplet margin loss (2.0x) -- to achieve speedups. We did not find successful usages of tensor core instructions, which are crucial for AI performance.
+\\\\
+\noindent \textbf{Algorithmic optimizations} Kernels can require algorithmic modifications to better utilize the hardware features. We found one interesting generation for the problem of performing a multiplication between a dense and diagonal matrix, where the kernel scales each row (or column), rather than loading the zero-entries of the diagonal matrix, yielding a 13x speedup over PyTorch Eager. 
+
+\subsection{Conclusion}
+Our contributions are: (1) We present KernelBench, a framework that lays the groundwork for LM-driven kernel optimization, and (2) We evaluate a diverse set of models and approaches, analyzing their strengths and limitations, and providing insights into opportunities for improvement.
+
+Overall, while most benchmarks eventually saturate, KernelBench is designed to dynamically evolve as new AI workloads arise.  Our \fast{p} metric can be adapted over time to measure the speedup threshold ($p$) over increasingly advanced baselines (i.e., beyond the PyTorch baseline used in our work). Since PyTorch is cross-hardware platform compatible, the PyTorch-based tasks in KernelBench tasks can be evaluated on every \textit{new hardware platform} release. 
+Finally, unlike many benchmarks, success on KernelBench directly maps to production value and real-world impacts (lowering costs and reducing energy consumption at scale). These properties ensure that KernelBench will remain valuable in the ever-evolving AI landscape.
+
+\subsection{Opportunities for Future Work}
+We show that there is significant room for improvement on KernelBench given the currently available models. 
+First, future work can explore the development of advanced fine-tuning and reasoning techniques, including agentic workflows. Since CUDA is a low-resource language, it would be valuable for future work to open-source more high quality data. Second, LMs generate raw CUDA code in our experiments. However, future work can explore whether generating code using alternative programming abstractions (e.g., provided in ThunderKittens, CUTLASS, Triton, and others) can simplify the generation problem, for instance by making it easier for LMs to leverage tensor core instructions. Third, our evaluation has also been limited to GPUs so far and future work can expand to other hardware accelerators. 
+
+\section*{Ethics Statement}
+Optimized GPU kernels can lead to significant energy savings in large-scale machine learning workloads, reducing both computational costs and environmental impact. By providing a framework for AI-assisted performance tuning, KernelBench contributes to more energy-efficient AI systems, aligning with global efforts to reduce the carbon footprint of computing infrastructure.
+
+KernelBench does not involve human studies or collect user data, eliminating privacy concerns. It also avoids proprietary or private code, relying solely on publicly available Github repositories.

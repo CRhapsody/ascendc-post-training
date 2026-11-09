@@ -1,0 +1,45 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"nodeSpacing":30,"rankSpacing":42,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M2–M5｜读取参考与 14 case<br/>缩放、布尔掩码、末维 softmax"]:::context
+    setup["M18–M34｜修复模板路径并备份<br/>成功精简为 9 case"]:::action
+    design["M51–M59｜生成 TileLang 设计<br/>AST 检查通过，未见功能运行"]:::action
+    ascend["M73–M86｜生成初版 AscendC<br/>当时的 wrapper AST 检查通过"]:::action
+    compilefail["M87–M91｜首次编译失败<br/>DataCopyPad 参数不匹配"]:::fail
+    initfail["M94–M103｜修复制接口并重建<br/>编译后遇到模型初始化错误"]:::fail
+    precisionfail["M112–M118｜修正初始化接口<br/>9 case 数值验证失败"]:::fail
+    queuefail["M121–M136｜改 mask 缓冲与队列<br/>两轮重测仍失败"]:::fail
+    dtypefail["M139–M179｜改 dtype、搬运和缓冲<br/>多轮重测仍失败"]:::fail
+    rewritefail["M180–M193｜做拷贝诊断并重写<br/>新的验证仍报精度失败"]:::fail
+    preprocess["M194–M200｜将 mask 和 scale<br/>移到 Python wrapper 的 NPU 运算"]:::action
+    ninepass["M202–M203｜重新编译验证<br/>精简集 9/9 通过"]:::pass
+    finalwrapper["M204–M207｜重写最终 wrapper<br/>预处理后传零 mask 与 scale 1"]:::action
+    perffail["M211–M232｜尝试性能脚本<br/>路径、初始化及解包错误"]:::fail
+    timing["M233–M234｜自写同步 wall-clock 测试<br/>9 case 均时比 0.57x，未加速"]:::unverified
+    restore["M238｜恢复 14 case JSON<br/>立即调用完整精度验证"]:::action
+    fullpass["M239｜全量 14/14 通过<br/>各 case 有独立 matched 输出"]:::pass
+    claim["M243–M247｜写 trace 并总结<br/>全量性能及最终 AST 无新证据"]:::unverified
+
+    reference --> setup
+    setup --> design
+    design --> ascend
+    ascend --> compilefail
+    compilefail --> initfail
+    initfail --> precisionfail
+    precisionfail --> queuefail
+    queuefail --> dtypefail
+    dtypefail --> rewritefail
+    rewritefail --> preprocess
+    preprocess --> ninepass
+    ninepass --> finalwrapper
+    finalwrapper --> perffail
+    perffail --> timing
+    timing --> restore
+    restore --> fullpass
+    fullpass --> claim
+
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px;
+    classDef pass fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:2px;
+    classDef fail fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:2px;
+    classDef context fill:#F3F4F6,stroke:#6B7280,color:#1F2937,stroke-width:2px;
+    classDef unverified fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:2px;
+    linkStyle default stroke:#475569,stroke-width:2px;

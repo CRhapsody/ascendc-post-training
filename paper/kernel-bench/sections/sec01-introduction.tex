@@ -1,0 +1,58 @@
+AI relies on efficient GPU kernels to achieve high performance and cost and energy savings; however, developing kernels remains challenging. 
+% FlashAttention3~\cite{dao2024flashattention3}. 
+There has been a Cambrian explosion of ML architectures~\cite{tay2022efficient, peng2023rwkv, dao2024transformers}, but their available implementations routinely underperform their peak potential. We are seeing a proliferation of AI hardware ~\cite{nvidia2017nvidia, nvidia2020nvidia, nvidia2022nvidia, jouppi2023tpuv4opticallyreconfigurable, groq-chip, cerebras-wse, graphcore-ipu}, each with different specs and instruction sets, and porting algorithms across platforms is a pain point. A key example is the FlashAttention kernel \cite{dao2022flashattention}, which is 
+% for Transformers 
+% a memory efficient implementation of the attention mechanism 
+crucial for running modern Transformer models –– the initial kernel released in 2022, five years after the Transformer was proposed; it took two more years from the release of NVIDIA Hopper GPUs to transfer the algorithm to the new hardware platform. We explore the question: \textit{Can language models help write correct and optimized kernels?}
+
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/KernelBench-Flow-HD.png} % Use \textwidth to span both columns
+    \vspace{-20pt}
+    \caption{\textbf{KernelBench evaluates LMs' ability to generate performant GPU Kernels}. Overview of tasks in KernelBench: KernelBench tasks LMs with generating optimized CUDA kernels for a given target PyTorch model architecture and conducts automated evaluation}
+    \vspace{-10pt}
+    \label{fig:kernelbench-workflow}
+\end{figure*}
+
+AI engineers use a rich set of information when developing kernels and it is not clear whether language models (LMs) can mimic the workflow. They use compiler feedback, profiling metrics, hardware-specific specs and instruction sets, and knowledge of hardware-efficiency techniques (e.g., tiling, fusion). They can use programming tools ranging from assembly (e.g., PTX as in ~\citet{deepseekv3}) to higher-level libraries (ThunderKittens~\cite{spector2023thunderkittens}, Triton~\cite{triton}). Compared to existing LM code generation workloads~\cite{yang2024swe}, kernel writing requires a massive \textit{amount} and \textit{diversity} of information. We first design an environment that reflects the typical AI engineer's workflow and supports providing LMs with this rich information. The environment should:
+% that not only enables LMs to optimize kernel generation efficiently but also ensures that the evaluation is meaningful and reflects LMs' full potential.
+% This 
+% raises the 
+% requires careful navigation of a large design space with the 
+% following key considerations:
+
+\begin{itemize}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+    \item \textbf{Automate} the AI engineer's workflow. The model should have full flexibility to decide which operators to optimize and how to optimize them.
+    \item Support a \textbf{diverse} set of AI algorithms, programming languages, and hardware platforms.
+    \item Make it \textbf{easy to evaluate} both performance and functional correctness of LM generations, ideally in a programmatic way. It should also capture profiling and execution information from generated kernels. 
+    % process is desirable, as it enables reproducible large-scale benchmarking. 
+\end{itemize}
+
+\noindent We introduce \textbf{KernelBench} to generate and evaluate kernels, which addresses the above considerations. KernelBench tests LM optimizations on three levels of AI workloads:
+\begin{enumerate}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+    \item \textbf{Individual operations:} We include various AI operators, including matrix multiplies, convolutions, activations, norms, and losses. While PyTorch already uses expert-optimized closed-source kernels, making this a potentially challenging baseline, it is valuable if LMs can generate open-source kernels for the operations.
+    \item \textbf{Sequence of operations:} We provide problems that contain 3-6 individual operations together (e.g. a mainloop operator like matmul followed by pointwise operators like ReLU and Bias). This enables evaluating the models' ability to fuse multiple operators.
+    % , an important optimization for kernels.
+    \item \textbf{End-to-end architectures:} We select architectures from popular AI repositories on Github including \texttt{pytorch}, \texttt{huggingface/transformers}, and \texttt{huggingface/pytorch-image-models}. These architectures contain many operations.
+\end{enumerate}
+
+\noindent Mimicking an AI researcher's workflow, the LM takes PyTorch reference code as input and outputs an optimized version of the code.
+% while maintaining functional correctness. 
+Similar to the human kernel development process, our environment enables the LM to iterate with compiler and profiler feedback to refine performance. The LM is free to use any programming language and decide both \textit{which parts} of the PyTorch code to optimize, and \textit{how} to optimize them. Our pipeline allows us to feed diverse information to the LMs, including hardware-specific information, example kernels, and compiler/profiler feedback.
+% The design is flexible in accommodating diverse programming languages and libraries because the LM can implement any approach as long as it integrates with PyTorch, which is a typical workflow in AI research.
+
+% Our set-up allows us to programmatically measure success by comparing model output to the reference for correctness and to the PyTorch baseline for speed. We unify these metrics by proposing the $\mathbf{fast_p}$ metric: the percentage of correct kernels that outperform the PyTorch reference by $ > \mathbf{p}$ speedup, where speedup the ratio of PyTorch baseline wallclock time to generated kernel time. An advantage of this metric is that its adaptability  –– increasing the threshold $p$ allows us to progressively increase the evaluation's difficulty.
+
+
+We observe that frontier and open-source models perform poorly out-of-the-box on KernelBench, with OpenAI-o1 and DeepSeek-R1 matching the PyTorch Eager baseline on $<20\%$ of the tasks. These model-generated kernels greatly suffer from execution errors, functional correctness issues, and are unable to perform platform-specific optimizations. To identify areas for improvement, we conduct a series of experiments and analysis, and find that:
+
+% \begin{itemize}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+% \begin{enumerate}[leftmargin=*, itemsep=0pt] % or 
+\begin{enumerate}[itemsep=0.1pt,topsep=0pt,leftmargin=*]
+    \item \textit{\textit{Writing functionally }\textit{\textbf{correct}}\textit{ kernels remains challenging for models:} }while models are able to fix execution failures through either reasoning or multiple attempts, they struggle to produce functionally correct code. Furthermore, we observe a trade-off between LMs attempting more complex optimizations / niche hardware instructions (e.g., tensor core \texttt{wmma}) and producing error-free kernels. We hypothesize this is due to CUDA being a low-resource language in open-source training data, only $0.073\%$ of popular code corpus The Stack v1.2 \cite{li2023starcodersourceyou, kocetkov2022stack3tbpermissively}.
+    
+    \item \textit{\textit{Models demonstrate potential to produce }\textit{\textbf{performant}}\textit{ kernels via optimizations:}} We observe a few instances where LMs make algorithmic improvements -- e.g., exploiting sparsity, operator fusion, and utilizing hardware features. We notice more of such instances when we explicitly condition the LM on hardware information (e.g., bandwidth and TFLOP specs) and demonstrations of hardware optimization techniques (e.g., tiling, fusion). While these capabilities remain nascent, LMs do \textbf{demonstrate potential} for generating performant kernels. 
+    \item \textit{Leveraging}\textit{\textbf{ feedback}}\textit{ is important for reducing execution errors and discovering faster solutions:} By providing execution results and profiler feedback to the LM in context, the kernel quality significantly improves after multiple refinements from $12\%$, $36\%$, and $12\%$ in \fast{1} to $43\%$, $72\%$, and $18\%$ respectively.
+\end{enumerate}
+
+\noindent Our findings highlight the technical challenges we need to solve in order to adopt LMs for kernel writing. These include but are not limited to: how to improve LM performance in a low-resource data regime, and how to select from the rich set of information we can provide to models. To address these challenges, we contribute (1) \textbf{an open-source framework} to study LM kernel generation with a comprehensive suite of evaluation problems and (2) \textbf{analysis of where current LMs stand} and how to realize a future of efficient kernels generated by models. 

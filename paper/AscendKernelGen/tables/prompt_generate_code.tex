@@ -1,0 +1,167 @@
+% !htbp
+\begin{table}[H]
+
+  \centering
+  % ============================= Outer container (single prompt)
+  \begin{tcolorbox}[
+    rounded corners,
+    arc=3pt,
+    enhanced,
+    width=1\textwidth,
+    colframe=codegreen, % <----- CHANGED
+    colback=white,
+    title=\textbf{Prompts for Generating Kernel Code in NPUKernelBench},
+    fonttitle=\bfseries\small,
+    boxrule=0.6pt,
+    left=2pt,
+    right=2pt,
+    top=0pt,
+    bottom=1pt
+  ]
+    \begin{tcolorbox}[
+      sharp corners,
+      colframe=reforange,
+      colback=reforange!5,
+      colbacktitle=reforange!15,
+      coltitle=reforange,
+      boxrule=0.4pt,
+      title={\textbf{Instructions}},
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+{\small Please see Table~\ref{tab:prompt_ins}.}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=taskblue,
+      colback=taskblue!5,
+      colbacktitle=taskblue!15,
+      coltitle=taskblue,
+      boxrule=0.4pt,
+      title={\textbf{API\_Desc.md}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=0pt,
+      bottom=0pt
+    ]
+\begin{lstlisting}[style=mdstyle]
+# aclnnBasicMatmul 
+## Function Description 
+### Kernel Function 
+This Ascend C kernel performs the multiplication of two 2D matrices, A and B. It is a core component in deep learning models, such as linear layers and attention mechanisms. It takes two 2D tensors that satisfy the matrix multiplication rule and outputs their product.
+### Computational Formula 
+Assume the input tensors are $A$ ($m \times k$) and $B$ ($k \times n$). The output tensor $C$ ($m \times n$) is computed as: $$C_{ij} = \sum_{p=1}^{k} A_{ip} B_{pj}$$, where $i$ ranges from $1$ to $m$, and $j$ ranges from $1$ to $n$. $C_{ij}$ denotes the element in the $i$-th row and $j$-th column of $C$.
+### Computation Process and Type Conversion
+To maintain high numerical precision during large-scale accumulation and effectively prevent data overflow, this kernel adopts a high-precision accumulation strategy during computation. The process is as follows: 
+1. The kernel receives two input tensors  `a` and `b`, both of data type `float16`.
+2. During the multiply-accumulate computation, the internal accumulator uses the `float32` data type. In other words, the product results of `float16` inputs are first converted to `float32` before accumulation.
+3. After all accumulation operations are completed, a result tensor of type `float32` is obtained.
+4. Finally, the `float32` result tensor is converted back to `float16` as the final output.
+## Interface Definition
+### Kernel Prototype Definition Interface
+#### Input 
+- a: Device-side aclTensor corresponding to A in the formula; supports float16, 2D, and ND format.
+- b: Device-side aclTensor corresponding to B in the formula; supports float16, 2D, and ND format.
+#### Output 
+- c: Device-side aclTensor corresponding to C in the formula; supports float16, 2D, and ND format.
+#### Attr 
+- None
+## Constraints and Limitations
+* The input tensors `a` and `b` currently support only the `float16` data type.
+* The input tensors `a` and `b` must both be two-dimensional matrices.
+* The second dimension (number of columns) of `a` must be equal to the first dimension (number of rows) of `b`.
+* The input tensors support only the ND data format.
+\end{lstlisting}
+ \end{tcolorbox}
+ 
+% --------------- Part 2: Previous CUDA implement with scores
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Host template}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-4pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python]
+#include "register/op_def_registry.h" 
+#include "tiling/platform/platform_ascendc.h" 
+namespace optiling { 
+static ge::graphStatus TilingFunc(gert::TilingContext *context) 
+{ 
+    context->SetBlockDim(platform_ascendc::PlatformAscendCManager::GetInstance()->GetCoreNumAic()); 
+    return ge::GRAPH_SUCCESS; 
+} 
+} // namespace optiling 
+namespace ops { 
+class BasicMatmul : public OpDef { 
+public: 
+    explicit BasicMatmul(const char *name) : OpDef(name) 
+{ 
+        this->Input("a") 
+            .ParamType(REQUIRED) 
+            .DataType({ge::DT_FLOAT16}) 
+            .Format({ge::FORMAT_ND}); 
+        this->Input("b") 
+            .ParamType(REQUIRED) 
+            .DataType({ge::DT_FLOAT16}) 
+            .Format({ge::FORMAT_ND}); 
+        this->Output("c") 
+            .ParamType(REQUIRED) 
+            .DataType({ge::DT_FLOAT16}) 
+            .Format({ge::FORMAT_ND}); 
+        this->AICore() 
+            .SetTiling(optiling::TilingFunc) 
+            .AddConfig("ascend910_93") 
+            .AddConfig("ascend910b"); 
+    } 
+}; 
+OP_ADD(BasicMatmul); 
+} // namespace ops
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+      sharp corners,
+      colframe=refgreen,
+      colback=refgreen!5,
+      colbacktitle=refgreen!15,
+      coltitle=refgreen,
+      boxrule=0.4pt,
+      title={\textbf{Kernel template}},
+      fonttitle=\bfseries\small,
+      left=0pt,
+      right=0pt,
+      top=-4pt,
+      bottom=-5pt
+    ]
+      \begin{center}
+        \begin{lstlisting}[style=mystyle, frame=none,framerule=0pt, language=Python]
+#include <kernel_operator.h> 
+using namespace AscendC; 
+extern "C" __global__ __aicore__ void basic_matmul(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace, GM_ADDR tiling) 
+{ 
+}
+\end{lstlisting}
+\end{center}
+\end{tcolorbox}
+\end{tcolorbox}
+\vspace{-10pt}
+\caption{An example of the structured prompt used for Ascend kernel generation, consisting of three components: API description, host/kernel-side template.}
+\label{tab:kernel_gen}
+\end{table}
+
+

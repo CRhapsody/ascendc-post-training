@@ -1,0 +1,386 @@
+In this section we provide examples of interesting or notable kernel generations. We first expand on the discussion in Section~\ref{sec-6:discussion}, where we defined the following categories of optimizations: algorithmic optimizations, operator fusion, and using hardware features. 
+
+\subsection{Algorithmic Optimizations}
+\textbf{\textit{13x Speedup} on Level 1 Problem 11 by Claude-3.5 Sonnet} \\
+The original torch operator is \texttt{torch.diag(A) @ B}, multiplying a diagonal matrix formed from the vector \texttt{A} with the matrix \texttt{B}. The model identifies an optimization in the special case of a diagonal matrix multiplication, where the diagonal matrix doesn't need to be explicitly constructed. Instead, each element of the vector \texttt{A} is directly multiplied with the corresponding row in matrix \texttt{B}, significantly improving performance:
+
+\begin{figure}[H]
+\begin{lstlisting}[basicstyle=\scriptsize\ttfamily]
+__global__ void diag_matmul_kernel(
+    const float* diag,
+    const float* mat,
+    float* out,
+    const int N,
+    const int M) {
+    
+    const int row = blockIdx.y * blockDim.y + threadIdx.y;
+    const int col = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (row < N && col < M) {
+        out[row * M + col] = diag[row] * mat[row * M + col];
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+\subsection{Kernel Fusion}
+\textbf{\textit{2.9x Speedup} on Level 1 Problem 87 by DeepSeek-V3} \\
+GeLU reference in torch:
+
+\begin{figure}[H]
+\begin{lstlisting}
+0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
+\end{lstlisting}
+\end{figure}
+
+\noindent Optimized version fuses in a single kernel. There is also a small constant folding optimization, instead of computing \texttt{math.sqrt(2.0 / math.pi)} repeatedly, the kernel uses the precomputed value \texttt{0.7978845608028654f}:
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void gelu_kernel(const float* x, float* out, int size) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < size) {
+        float x_val = x[idx];
+        float cdf = 0.5f * (1.0f + tanhf((0.7978845608028654f * (x_val + 0.044715f * x_val * x_val * x_val))));
+        out[idx] = x_val * cdf;
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+\noindent \textbf{\textit{1.3x Speedup} on Level 1 Problem 29 by Claude-3.5 Sonnet} \\
+SoftSign reference in torch:
+\begin{figure}[H]
+\begin{lstlisting}
+x / (1 + torch.abs(x))
+\end{lstlisting}
+\end{figure}
+
+Fused kernel:
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void softsign_kernel(const float* input, float* output, int size) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < size) {
+        float x = input[idx];
+        float abs_x = abs(x);
+        output[idx] = x / (1.0f + abs_x);
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+\noindent \textbf{\textit{2.6x Speedup} on Level 2 Problem 13 by Claude-3.5 Sonnet} \\
+Sequence of operators in torch:
+\begin{figure}[H]
+\begin{lstlisting}
+x = torch.matmul(x, self.weight.T)  # Gemm
+x = x / 2  # Divide
+x = torch.sum(x, dim=1, keepdim=True) # Sum
+x = x * self.scaling_factor  # Scaling
+\end{lstlisting}
+\end{figure}
+
+\noindent Fused kernel:
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void fused_ops_kernel(
+    const float* input,
+    const float* weight,
+    float* output,
+    const float scaling_factor,
+    const int batch_size,
+    const int input_size,
+    const int hidden_size
+) {
+    // Each thread handles one element in the batch
+    const int batch_idx = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (batch_idx < batch_size) {
+        float sum = 0.0f;
+        
+        // Compute matmul and divide for this batch element
+        for(int h = 0; h < hidden_size; h++) {
+            float elem = 0.0f;
+            for(int i = 0; i < input_size; i++) {
+                elem += input[batch_idx * input_size + i] * 
+                        weight[h * input_size + i];
+            }
+            // Divide by 2 as we go
+            sum += (elem / 2.0f);
+        }
+        
+        // Scale and store final result
+        output[batch_idx] = sum * scaling_factor;
+    }
+}
+\end{lstlisting}
+\end{figure}
+\noindent Despite this good example, overall Level 2 generated kernels show insufficient fusion. It is expected that most Level 2 problems can be expressed in a single fused kernel. 
+\\\\
+\noindent \textbf{\textit{1.9x Speedup} on Level 3 Problem 49 by OpenAI-o1} \\
+We have a hypothetical architecture of the attention mechanism where the softmax is replaced with a ReLU.
+\begin{figure}[H]
+\begin{lstlisting}
+    att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+    att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
+    att = F.relu(att)
+\end{lstlisting}
+\end{figure}
+\noindent The model found an optimization that fuses the scaling, masked fill, and ReLU but not anything else, resulting in a modest improvement of 1.9x.
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void fused_masked_fill_scale_relu_kernel(
+    const float* __restrict__ att,
+    const float* __restrict__ bias,
+    float* __restrict__ output,
+    int total_elems,
+    float scale,
+    int T,
+    float negative_infinity
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < total_elems) {
+        float val = att[idx] * scale;
+        int bias_idx = idx % (T * T);
+        if (bias[bias_idx] == 0.0f) {
+            val = negative_infinity;
+        }
+        if (val < 0.0f) {
+            val = 0.0f;
+        }
+        output[idx] = val;
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+\subsection{Hardware Features}
+\textbf{\textit{2.8x Speedup} on Level 1 Problem 96 by OpenAI-o1} \\
+Torch reference for Cosine Similarity Loss
+\begin{figure}[H]
+\begin{lstlisting}
+cosine_sim = torch.nn.functional.cosine_similarity(predictions, targets, dim=1)
+return torch.mean(1 - cosine_sim)
+\end{lstlisting}
+\end{figure}
+The generated kernel uses shared memory for reduce redundant global memory accesses, improving data locality and increasing overall performance. This is a moderately complicated kernel with synchronization points and reductions that would be tricky for humans to get right.
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void cosine_similarity_loss_kernel(
+    const float* __restrict__ predictions,
+    const float* __restrict__ targets,
+    float* __restrict__ losses,
+    const int batch_size,
+    const int input_size
+) {
+    // Each block handles one sample in the batch
+    int sample_idx = blockIdx.x;
+    if (sample_idx >= batch_size) return;
+
+    // Shared memory for reductions
+    extern __shared__ float sdata[];
+
+    // Pointers to data for this sample
+    const float* pred = predictions + sample_idx * input_size;
+    const float* targ = targets + sample_idx * input_size;
+
+    // Intermediate sums for dot product and norms
+    float thread_dot = 0.0f;
+    float thread_pred_norm_sq = 0.0f;
+    float thread_targ_norm_sq = 0.0f;
+
+    for (int idx = threadIdx.x; idx < input_size; idx += blockDim.x) {
+        float p = pred[idx];
+        float t = targ[idx];
+        thread_dot += p * t;
+        thread_pred_norm_sq += p * p;
+        thread_targ_norm_sq += t * t;
+    }
+
+    // Reduction for dot product
+    sdata[threadIdx.x] = thread_dot;
+    __syncthreads();
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (threadIdx.x < s) {
+            sdata[threadIdx.x] += sdata[threadIdx.x + s];
+        }
+        __syncthreads();
+    }
+    float dot_product = sdata[0];
+
+    // Reduction for pred_norm_sq
+    sdata[threadIdx.x] = thread_pred_norm_sq;
+    __syncthreads();
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (threadIdx.x < s) {
+            sdata[threadIdx.x] += sdata[threadIdx.x + s];
+        }
+        __syncthreads();
+    }
+    float norm_pred = sqrtf(sdata[0] + 1e-8f);
+
+    // Reduction for targ_norm_sq
+    sdata[threadIdx.x] = thread_targ_norm_sq;
+    __syncthreads();
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (threadIdx.x < s) {
+            sdata[threadIdx.x] += sdata[threadIdx.x + s];
+        }
+        __syncthreads();
+    }
+    float norm_targ = sqrtf(sdata[0] + 1e-8f);
+
+    if (threadIdx.x == 0) {
+        float cosine_sim = dot_product / (norm_pred * norm_targ + 1e-8f);
+        losses[sample_idx] = 1.0f - cosine_sim;
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+\noindent \textbf{\textit{1.9x Speedup} on Level 1 Problem 98 by Deepseek-R1} \\
+Torch reference for Cosine Similarity Loss
+\begin{figure}[H]
+\begin{lstlisting}
+self.loss_fn = torch.nn.TripletMarginLoss(margin=margin)
+self.loss_fn(anchor, positive, negative)
+\end{lstlisting}
+\end{figure}
+\noindent Another example of a generated kernel using shared memory:
+\begin{figure}[H]
+\begin{lstlisting}
+__global__ void triplet_margin_loss_kernel(
+    const float* anchor, 
+    const float* positive, 
+    const float* negative, 
+    float* losses, 
+    float margin, 
+    int feature_size) 
+{
+    extern __shared__ float shared_sums[];
+
+    int batch_idx = blockIdx.x;
+    int tid = threadIdx.x;
+
+    int offset = batch_idx * feature_size;
+
+    const float* a = anchor + offset;
+    const float* p = positive + offset;
+    const float* n = negative + offset;
+
+    float a_p_sum = 0.0f;
+    float a_n_sum = 0.0f;
+
+    int stride = blockDim.x;
+    for (int i = tid; i < feature_size; i += stride) {
+        float diff_ap = a[i] - p[i];
+        a_p_sum += diff_ap * diff_ap;
+        float diff_an = a[i] - n[i];
+        a_n_sum += diff_an * diff_an;
+    }
+
+    shared_sums[tid] = a_p_sum;
+    shared_sums[blockDim.x + tid] = a_n_sum;
+
+    __syncthreads();
+
+    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            shared_sums[tid] += shared_sums[tid + s];
+            shared_sums[blockDim.x + tid] += shared_sums[blockDim.x + tid + s];
+        }
+        __syncthreads();
+    }
+
+    if (tid == 0) {
+        float d_ap = sqrtf(shared_sums[0]);
+        float d_an = sqrtf(shared_sums[blockDim.x]);
+        losses[batch_idx] = fmaxf(d_ap - d_an + margin, 0.0f);
+    }
+}
+\end{lstlisting}
+\end{figure}
+
+
+\subsection{Iterative Refinement Examples} \label{appendix:iterative-refinement}
+\subsubsection{Iteratively Trying new Optimizations}
+We provide an example of a kernel that iteratively improves on its existing generation. In the following example, the model attempts new optimizations incorrectly, fixes them, and continue to attempt new optimizations, improving its kernel to faster than the \texttt{torch.compile} baseline ($1.34$ms) but short of the Torch Eager baseline ($0.47$ms).
+\\\\
+\noindent \textbf{Level 1, Problem 63: 2D convolution with square input and square kernel. DeepSeek-R1 with Execution and Profile Feedback}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcccccccccc}
+\toprule
+ \textbf{Turn \#} & \textbf {1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} \\
+\midrule
+\textbf{Compiles?} & $\checkmark$ & \xmark & $\checkmark$ & \xmark & $\checkmark$ & $\checkmark$ & \xmark & $\checkmark$ & \xmark & $\checkmark$ \\
+\textbf{Correct?} & $\checkmark$ & \xmark & $\checkmark$ & \xmark & $\checkmark$ & $\checkmark$ & \xmark & $\checkmark$ & \xmark & $\checkmark$ \\
+\textbf{Runtime (ms)} & 9.1 & - & 1.57 & - & 1.83 & 1.43 & - & \textbf{1.13} & - & 1.46 \\
+\bottomrule
+\end{tabular}
+\caption{Iterative refinement trajectory of DeepSeek-R1 with execution feedback $E$ and profiler feedback $P$ on Problem 63, Level 1. Torch Eager baseline runs in $0.47$ms and \texttt{torch.compile} runs in $1.34$ms.}
+\label{tab:level1-prob63}
+\end{table}
+
+\noindent In this example, we see a $8\times$ speedup in average kernel runtime from its initial generation, where the model repeatedly (incorrectly) refines its kernel, fixes the compiler issues using feedback, then continues to attempt more optimizations. The first big jump in performance $(\text{Turn 1} \rightarrow \text{Turn 3})$ occurs because the model decides to launch thread blocks along an output channel dimension, when it originally computed these elements sequentially. The model then attempts to use shared memory in Turn 5, and continues using it, along with texture cache memory with the \texttt{\_\_ldg} instruction in Turns 7 and 8.
+
+
+\subsubsection{Leveraging Feedback to Correct Kernel Code}
+\textbf{Level 2, Problem 73: 2D Convolution with a BatchNorm and a scale factor. DeepSeek-R1 with Execution Feedback}
+
+We provide an example of a kernel that the model struggles to generate correctly, and produces a correct kernel after iterative refinement using execution feedback.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcccccccccc}
+\toprule
+ \textbf{Turn \#} & \textbf {1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} \\
+\midrule
+\textbf{Compiles?} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\textbf{Correct?} & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & $\checkmark$ \\
+\textbf{Runtime} & - & - & - & - & - & - & - & - & - & \textbf{3.16} \\
+\bottomrule
+\end{tabular}
+\caption{Iterative refinement trajectory of DeepSeek-R1 with execution feedback $E$ on Problem 73, Level 2. Torch Eager baseline runs in $0.105$ms and \texttt{torch.compile} runs in $0.156$ms.}
+\label{tab:level2-prob73}
+\end{table}
+
+\noindent In the above example, the model continually produces either the wrong output tensor shape or the wrong values and iterates on its kernel using this feedback until the final turn, where it generates a functionally correct, albeit non-performant kernel. We provide another example below that explicitly leverages compiler feedback to fix compiler errors:
+\\\\
+\noindent \textbf{Level 2, Problem 23: 3D Convolution with a GroupNorm and return the mean across all but the batch dimension. DeepSeek-R1 with Execution Feedback}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcccccccccc}
+\toprule
+ \textbf{Turn \#} & \textbf {1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} \\
+\midrule
+\textbf{Compiles?} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \xmark & \xmark & $\checkmark$ & $\checkmark$ & \xmark & $\checkmark$ \\
+\textbf{Correct?} & \xmark & \xmark & $\checkmark$ & $\checkmark$ & \xmark & \xmark & $\checkmark$ & $\checkmark$ & \xmark & \xmark \\
+\textbf{Runtime} & - & - & 11.4 & 1.36 & - & - & 1.39 & \textbf{1.33} & - & - \\
+\bottomrule
+\end{tabular}
+\caption{Iterative refinement trajectory of DeepSeek-R1 with execution feedback $E$ on Problem 23, Level 2. Torch Eager baseline runs in $1.29$ms and \texttt{torch.compile} runs in $0.719$ms.}
+\label{tab:level2-prob23}
+\end{table}
+
+In this example, the model attempts to use the \texttt{CUB} library, but incorrectly invokes function calls. The model is then able to correct these errors and write a slightly faster kernel in Turn 8 (see Table~\ref{tab:level2-prob23}).
+
+\subsubsection{Iterative Refinement Never Fixes the Error}
+\textbf{Level 1, Problem 54: 3D Convolution square input and square kernel. DeepSeek-R1 with Execution and Profiler Feedback}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcccccccccc}
+\toprule
+ \textbf{Turn \#} & \textbf {1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} \\
+\midrule
+\textbf{Compiles?} & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\textbf{Correct?} & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark \\
+\textbf{Runtime} & - & - & - & - & - & - & - & - & - & - \\
+\bottomrule
+\end{tabular}
+\caption{Iterative refinement trajectory of DeepSeek-R1 with execution feedback $E$ and profiler feedback $P$ on Problem 54, Level 1. Torch Eager baseline runs in $4.47$ms and \texttt{torch.compile} runs in $4.67$ms.}
+\label{tab:level1-prob54}
+\end{table}
+
+This problem is particularly interesting because no model is able to consistently produce functional code for this kernel, even with different forms of feedback and profiling information. Interestingly, the example before is an arguably more difficult version of this kernel that fuses the 3D convolution with another operator, and the same model is able to generate functional code for this task. In the example above, the model consistently makes the same mistake and continually generates a functionally incorrect kernel with the same value errors.

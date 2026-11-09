@@ -1,0 +1,31 @@
+\begin{table*}
+\centering
+    \begin{tcolorbox}[
+    breakable,
+      sharp corners,
+      colframe=refpurple,
+      colback=refpurple!5,
+      colbacktitle=refpurple!15,
+      coltitle=refpurple,
+      boxrule=0.4pt,
+      title={Kernel-level CoT}, 
+      fonttitle=\bfseries\small,
+      left=0.5pt,
+      right=0.5pt,
+      top=0.5pt,
+      bottom=0.5pt
+    ]
+
+% 使用自定义样式
+\begin{lstlisting}[language=json]
+{
+  "qus": "Please implement a utility function for computing the temporary buffer size required by the SwiGLU operator. The function should be able to determine the maximum and minimum buffer sizes based on the input shape and data type, as well as retrieve the buffer’s factor size. Some dependency code has already been provided; please complete the implementation based on the following summarized dependencies: [==========From swiglu\_tiling.h ==================...code...================== From /api\_check/host\_apicheck.h =======...code...==================== From impl/host\_log.h ======================...code...]",
+  "cot": "To solve this problem, I need to implement a utility function that computes the temporary buffer size required by the SwiGLU operator. The function must determine the maximum and minimum buffer sizes based on the input shape and data type, as well as return the buffer-size factor. According to the provided dependency code, basic interfaces and parameter-validation utilities already exist, so my task is to implement the core logic. Since SwiGLU requires intermediate results, its temporary-space needs vary across data types, and the Ascend processor also imposes alignment constraints, motivating the use of a minimum repeat-unit size. My design sets different multipliers for half-precision and single-precision data, defines a 256-byte minimum repeat unit, and validates both shape and datatype. The maximum buffer size is computed as the multiplier times the larger of the input-tensor byte size and the repeat-unit size, while the minimum buffer size uses only the repeat-unit size. The factor-size interface simply returns the chosen multiplier, enabling callers to compute the exact temporary-space requirement dynamically.",
+  "ans": "/* !\n * \\file swiglu_tiling.cpp\n * \\brief\n */\n# include \"lib/activation/swiglu_tiling.h\"\n\n#include <cstdint>\n#include <set>\n\n#include \"graph/tensor.h\"\n#include \"impl/host_log.h\"\n#include \"impl/api_check/host_apicheck.h\"\n\nnamespace AscendC {\nnamespace {\nconstexpr uint32_t SWIGLU_HALF_TMP_SIZE = 6;\nconstexpr uint32_t SWIGLU_FLOAT_TMP_SIZE = 0;\nconstexpr uint32_t SWIGLU_ONE_REPEAT_BYTE_SIZE = 256;\nstatic constexpr uint32_t SWI_GELU_HALF_SIEZ = 2;\nstatic constexpr uint32_t SWI_GELU_FLOAT_SIEZ = 4;\nstatic const std::set<uint32_t> SUPPORT_TYPESIZE = { SWI_GELU_HALF_SIEZ, SWI_GELU_FLOAT_SIEZ };\nstatic constexpr const char SWI_GELU_GET_MAX_MIN[] = \"GetSwiGLUMaxMinTmpSize\";\nstatic constexpr const char SWI_GELU_GET_TMP_BUFFER[] = \"GetSwiGLUTmpBufferFactorSize\";\n\ninline uint32_t GetSwiGLUMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)\n{\n    const uint32_t calcPro = (typeSize == sizeof(float)) ? SWIGLU_FLOAT_TMP_SIZE : SWIGLU_HALF_TMP_SIZE;\n    return calcPro * std::max(inputSize * typeSize, SWIGLU_ONE_REPEAT_BYTE_SIZE);\n}\n\ninline uint32_t GetSwiGLUMinTmpSize(const uint32_t typeSize)\n{\n    const uint32_t calcPro = (typeSize == sizeof(float)) ? SWIGLU_FLOAT_TMP_SIZE : SWIGLU_HALF_TMP_SIZE;\n    return calcPro * SWIGLU_ONE_REPEAT_BYTE_SIZE;\n}\n} // namespace\n\nvoid GetSwiGLUMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue,\n    uint32_t& minValue, const bool isReuseSource)\n{\n    HighLevelApiCheck::SrcShapeSizeVerifyingParameters<SWI_GELU_GET_MAX_MIN>(srcShape.GetShapeSize(), typeSize);\n    HighLevelApiCheck::TypeSizeVerifyingParameters<SWI_GELU_GET_MAX_MIN>(typeSize, SUPPORT_TYPESIZE);\n    HighLevelApiCheck::IsReuseSourceVerifyingParameters<SWI_GELU_GET_MAX_MIN>(isReuseSource);\n    const uint32_t inputSize = srcShape.GetShapeSize();\n    ASCENDC_HOST_ASSERT(inputSize > 0, return, \"Input Shape size must be greater than 0.\");\n\n    minValue = GetSwiGLUMinTmpSize(typeSize);\n    maxValue = GetSwiGLUMaxTmpSize(inputSize, typeSize);\n}\n\nvoid GetSwiGLUTmpBufferFactorSize(const uint32_t typeSize, uint32_t &maxLiveNodeCount, uint32_t &extraBuffer)\n{\n    HighLevelApiCheck::TypeSizeVerifyingParameters<SWI_GELU_GET_TMP_BUFFER>(typeSize, SUPPORT_TYPESIZE);\n    extraBuffer = 0;\n    maxLiveNodeCount = (typeSize == sizeof(float)) ? SWIGLU_FLOAT_TMP_SIZE : SWIGLU_HALF_TMP_SIZE;\n}\n} // namespace AscendC"
+}
+\end{lstlisting}
+\end{tcolorbox}
+\vspace{-10pt}
+\caption{A SwiGLU kernel CoT example for Ascend kernel SFT, consisting of three parts: question, CoT, and answer.}
+\label{tab:singel_example}
+\end{table*}

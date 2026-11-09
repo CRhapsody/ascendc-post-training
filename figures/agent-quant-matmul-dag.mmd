@@ -1,0 +1,49 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"PingFang SC, Arial","fontSize":"18px"},"flowchart":{"curve":"linear","htmlLabels":true,"nodeSpacing":30,"rankSpacing":42,"wrappingWidth":340}}}%%
+flowchart TB
+    reference["M2–M10｜读取参考与病例<br/>int8 矩阵乘；全量 10 case"]:::context
+    design["M19–M53｜备份后精简到 5 case<br/>生成 TileLang；AST 检查通过"]:::action
+    firstbuild["M87–M151｜初版 AscendC 构建<br/>编译修补后遇到初始化错误"]:::fail
+    referror["M152–M158｜修正初始化接口再测<br/>参考 NPU matmul 不支持 int32"]:::fail
+    cpuref["M167–M168｜改写参考 forward<br/>CPU 矩阵乘与反量化，再回 NPU"]:::unverified
+    mixfail["M169–M237｜混合核多轮修改和重测<br/>设备同步超时；中间也有编译错误"]:::fail
+    dualfail["M240–M354｜拆分 AIC 与 AIV 并重测<br/>API 编译、Vector 异常、精度失败"]:::fail
+    mixretry["M355–M404｜再次改为混合核<br/>两次测试仍报 507014 超时"]:::fail
+    dualretry["M405–M424｜再次拆分双核<br/>两次测试报 PythonDispatcher 异常"]:::fail
+    hybrid["M429–M436｜清理后写新方案<br/>AIC 矩阵乘，加 CPU 反量化"]:::action
+    wrongrows["M438–M467｜修指针、核数、预取<br/>多轮精度仍失败"]:::fail
+    locate["M468–M493｜独立检查矩阵输出<br/>首行片段正确，后续行不匹配"]:::action
+    stride["M496–M499｜修改 Fixpipe CopyOut<br/>目标行跨度改为实际 N"]:::action
+    fivepass["M502–M503｜重新编译和验证<br/>精简集 5/5 通过"]:::pass
+    prefetch["M504–M509｜恢复预取与 K 补齐配置<br/>再次验证 5/5 通过"]:::pass
+    perfargs["M515–M517｜首次性能调用<br/>hook 将重定向当参数，报错"]:::fail
+    perf["M518–M526｜性能工具完成<br/>报 605.21x；参考已改到 CPU"]:::unverified
+    restore["M527–M528｜恢复原始病例 JSON<br/>重新得到 10 case"]:::action
+    tenpass["M529–M533｜全量精度验证<br/>10/10 通过；MERE 与 MARE 为 0"]:::pass
+    claim["M537–M541｜读 JSON 并写 trace<br/>605.2087x；完成属声明"]:::unverified
+
+    reference --> design
+    design --> firstbuild
+    firstbuild --> referror
+    referror --> cpuref
+    cpuref --> mixfail
+    mixfail --> dualfail
+    dualfail --> mixretry
+    mixretry --> dualretry
+    dualretry --> hybrid
+    hybrid --> wrongrows
+    wrongrows --> locate
+    locate --> stride
+    stride --> fivepass
+    fivepass --> prefetch
+    prefetch --> perfargs
+    perfargs --> perf
+    perf --> restore
+    restore --> tenpass
+    tenpass --> claim
+
+    classDef action fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px;
+    classDef pass fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:2px;
+    classDef fail fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:2px;
+    classDef context fill:#F3F4F6,stroke:#6B7280,color:#1F2937,stroke-width:2px;
+    classDef unverified fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:2px;
+    linkStyle default stroke:#475569,stroke-width:2px;

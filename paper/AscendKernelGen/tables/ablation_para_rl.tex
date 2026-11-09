@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{DPO hyperparameter ablation in QWen3-8B.}
+\resizebox{1\linewidth}{!}{
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Negative Strategy} & \textbf{LR} & \textbf{LR Decay} & \textbf{Batch Size} & \textbf{Training Steps} & \textbf{Compile Rate (\%)} & \textbf{Exec. Rate (\%)} \\
+\midrule
+ (SFT) & - & - & - & - & \textbf{60.97} & \textbf{5.18}  \\
+ \multirow{2}{*}{Compile-pass but execution-fail} 
+  &  1e-6 &  constant &  64 &  150 & \textbf{44.21} & \textbf{8.31} \\
+  % &  5e-7 &  constant &  128 &  75  & \textbf{56.92}  & \textbf{9.10}  \\
+  & 1e-6 &  cosine &  64 &  150  & \textbf{54.03}  & \textbf{9.49}  \\
+ Compile-fail &  1e-6 &  constant &  64 &  150 & \textbf{32.00}  & \textbf{6.10} \\
+\bottomrule
+\end{tabular}
+}
+\label{tab:DPO_hyper}
+\end{table}
